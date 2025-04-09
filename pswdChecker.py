@@ -1,9 +1,8 @@
-from flask import Flask, render_template, request, session
+from flask import Blueprint, render_template, request, session
 import hashlib
 import time
 
-app = Flask(__name__)
-app.secret_key = "supersecretkey"
+pswd_app = Blueprint('pswd_app', __name__)  # ✅ Fix: Use __name__ not _name_
 
 sites = ["Banque SecurePlus", "Réseau Social ChatterBox", "Forum GeekZone"]
 
@@ -26,7 +25,7 @@ def simulate_crack(password):
     else:
         return "✅ Mot de passe sécurisé, crackage estimé : plusieurs années."
 
-@app.route("/", methods=["GET", "POST"])
+@pswd_app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         passwords = {}
@@ -42,7 +41,7 @@ def index():
         return render_template("memory_test.html", sites=sites)
     return render_template("index.html", sites=sites)
 
-@app.route("/memory_test", methods=["POST"])
+@pswd_app.route("/memory_test", methods=["POST"])
 def memory_test():
     passwords = session.get('passwords', {})
     score = 0
@@ -57,5 +56,4 @@ def memory_test():
     session.pop('passwords', None)
     return render_template("result.html", results=results, score=score, total=len(sites))
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    return render_template("result.html", results=results, score=score, total=len(sites))
