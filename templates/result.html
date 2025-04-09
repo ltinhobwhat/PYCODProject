@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Results</title></head>
+<body>
+  <h1>Results</h1>
+  <p>Score: {{ score }} / {{ total }}</p>
+  <ul>
+    {% for site, result in results.items() %}
+      <li>{{ site }}: {{ result }}</li>
+    {% endfor %}
+  </ul>
+  <a href="/">Back to menu</a>
+</body>
+</html>
