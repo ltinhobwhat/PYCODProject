@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyber Game Menu</title>
+    <style>
+        /* 🔮 Background & base styles */
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #f8f8f2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            cursor: url('https://cur.cursors-4u.net/cursors/cur-13/cur1163.cur'), auto; /* 💡 Neon cursor */
+        }
+
+        /* 🔮 Glitchy Title */
+        @keyframes glitch {
+            0% { text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7; }
+            25% { text-shadow: -2px 2px #00fff7, 2px -2px #ff00c8; }
+            50% { text-shadow: 2px -2px #ff00c8, -2px 2px #00fff7; }
+            75% { text-shadow: -1px -1px #ff00c8, 1px 1px #00fff7; }
+            100% { text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7; }
+        }
+
+        h1 {
+            color: #ff00ff;
+            text-shadow: 2px 2px #000;
+            margin-bottom: 2rem;
+            font-size: 3rem;
+            animation: glitch 1.2s infinite; /* 🌀 Apply glitch animation */
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 👈 Centers child elements horizontally */
+            justify-content: center;
+            gap: 1.2rem;
+        }
+        
+
+        form button {
+            background: #1f1c2c;
+            color: #00ffe1;
+            border: 2px solid #00ffe1;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            box-shadow: 0 0 10px #00ffe1;
+        }
+
+        /* 🌀 Button shake animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-3px); }
+            40% { transform: translateX(3px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+
+        form button:hover {
+            background: #00ffe1;
+            color: #1f1c2c;
+            box-shadow: 0 0 20px #00ffe1;
+            animation: shake 0.3s ease; /* 🌀 Apply shake on hover */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎮 PYCOD PROJECT</h1>
+
+    <div class="button-container">
+        <form action="{{ url_for('start_game', game_number=1) }}" method="get">
+            <button type="submit">Start Password Cracking</button>
+        </form>
+        <form action="{{ url_for('start_game', game_number=2) }}" method="get">
+            <button type="submit">Start Encryption Game</button>
+        </form>
+        <form action="{{ url_for('start_game', game_number=3) }}" method="get">
+            <button type="submit">Learn about CIA Triad</button>
+        </form>
+        <form action="{{ url_for('save_game') }}" method="get">
+            <button type="submit">💾 Save Game</button>
+        </form>
+        <form action="{{ url_for('end_game') }}" method="get">
+            <button type="submit">🛑 End Game</button>
+        </form>
+    </div>
+
+    <!-- 🎶 Background music -->
+    <audio autoplay loop hidden>
+        <source src="{{ url_for('static', filename='synth.mp3') }}" type="audio/mpeg">
+    </audio>
+    
+    
+</body>
+</html>
