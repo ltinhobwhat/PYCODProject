@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Memory Test</title></head>
+<body>
+  <h1>Re-enter the passwords you chose</h1>
+  <form method="POST" action="/pswdChecker/memory_test">
+    {% for site in sites %}
+      <label>{{ site }}</label>
+      <input type="password" name="{{ site }}"><br>
+    {% endfor %}
+    <button type="submit">Check</button>
+  </form>
+</body>
+</html>
