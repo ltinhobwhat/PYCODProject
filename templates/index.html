@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Password Checker</title></head>
+<body>
+  <h1>Enter passwords for the following sites</h1>
+  <form method="POST">
+    {% for site in sites %}
+      <label>{{ site }}</label>
+      <input type="password" name="{{ site }}"><br>
+    {% endfor %}
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
