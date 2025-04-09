@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, session
 import hashlib
 import time
 
-pswd_app = Blueprint('pswd_app', __name__)  # ✅ Fix: Use __name__ not _name_
+pswd_app = Blueprint('pswd_app', __name__)  
 
 sites = ["Banque SecurePlus", "Réseau Social ChatterBox", "Forum GeekZone"]
 
