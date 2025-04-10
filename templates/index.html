@@ -1,14 +1,454 @@
 <!DOCTYPE html>
-<html>
-<head><title>Password Checker</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Password Checker</title>
+    <style>
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #0a0a12;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(46, 12, 80, 0.3) 0%, transparent 60%),
+                linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #f8f8f2;
+            font-family: 'Rajdhani', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Grid overlay */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(15, 15, 30, 0.1) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(15, 15, 30, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            animation: gridMove 60s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+        
+        /* Main container */
+        .container {
+            background: rgba(15, 12, 41, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 225, 0.3);
+            border-radius: 15px;
+            padding: 3rem;
+            max-width: 90%;
+            width: 600px;
+            box-shadow: 0 0 40px rgba(0, 255, 225, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        /* Scan effect */
+        .container::after {
+            content: "";
+            position: absolute;
+            top: -150%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                rgba(0, 255, 225, 0),
+                rgba(0, 255, 225, 0.05),
+                rgba(0, 255, 225, 0)
+            );
+            transform: rotate(45deg);
+            animation: scan 8s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes scan {
+            0% { top: -150%; }
+            100% { top: 150%; }
+        }
+        
+        /* Corner decorations */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffe1;
+            opacity: 0.8;
+        }
+        
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .corner-tr {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .corner-bl {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+        
+        /* Title styling */
+        .title-wrapper {
+            position: relative;
+            margin-bottom: 2rem;
+            text-align: center;
+            z-index: 5;
+        }
+        
+        h1 {
+            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            position: relative;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(0, 255, 225, 0.5);
+        }
+        
+        .subtitle {
+            color: #00ffe1;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+        
+        /* Password form */
+        .password-form {
+            position: relative;
+            z-index: 5;
+        }
+        
+        .site-container {
+            margin-bottom: 1.5rem;
+            border-left: 2px solid rgba(0, 255, 225, 0.3);
+            padding-left: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .site-container:hover {
+            border-left: 2px solid rgba(0, 255, 225, 1);
+        }
+        
+        .site-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: #00ffe1;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .password-input {
+            width: 100%;
+            background: rgba(15, 12, 41, 0.7);
+            border: 1px solid rgba(0, 255, 225, 0.3);
+            color: #ffffff;
+            padding: 0.8rem 2.8rem 0.8rem 1rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .password-input:focus {
+            outline: none;
+            border-color: #00ffe1;
+            box-shadow: 0 0 10px rgba(0, 255, 225, 0.5);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: rgba(0, 255, 225, 0.7);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .password-strength {
+            height: 4px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 5px;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .strength-meter {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+        
+        /* Submit button */
+        .submit-button {
+            display: block;
+            width: 100%;
+            background: rgba(15, 12, 41, 0.7);
+            color: #00ffe1;
+            border: 2px solid #00ffe1;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 2rem;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 255, 225, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+        
+        .submit-button:hover::before {
+            left: 100%;
+        }
+        
+        .submit-button:hover {
+            background: rgba(0, 255, 225, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 225, 0.8);
+        }
+        
+        /* Status indicators */
+        .status-bar {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            font-size: 0.7rem;
+            color: rgba(0, 255, 225, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00ffe1;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        /* Data lines animations */
+        .data-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        .data-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffe1, transparent);
+            width: 100%;
+            top: 0;
+            animation: dataMove 8s linear infinite;
+            opacity: 0;
+        }
+        
+        @keyframes dataMove {
+            0% { 
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
 <body>
-  <h1>Enter passwords for the following sites</h1>
-  <form method="POST">
-    {% for site in sites %}
-      <label>{{ site }}</label>
-      <input type="password" name="{{ site }}"><br>
-    {% endfor %}
-    <button type="submit">Submit</button>
-  </form>
+    <!-- Data lines animation -->
+    <div class="data-lines">
+        <div class="data-line" style="animation-delay: 0s;"></div>
+        <div class="data-line" style="animation-delay: 2s;"></div>
+        <div class="data-line" style="animation-delay: 4s;"></div>
+        <div class="data-line" style="animation-delay: 6s;"></div>
+        <div class="data-line" style="animation-delay: 1s;"></div>
+        <div class="data-line" style="animation-delay: 3s;"></div>
+        <div class="data-line" style="animation-delay: 5s;"></div>
+        <div class="data-line" style="animation-delay: 7s;"></div>
+    </div>
+
+    <div class="container">
+        <!-- Decorative corners -->
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        
+        <div class="title-wrapper">
+            <h1>Access Verification Required</h1>
+            <div class="subtitle">Enter passwords for secure system access</div>
+        </div>
+        
+        <form class="password-form" method="POST">
+            {% for site in sites %}
+            <div class="site-container">
+                <label class="site-label">{{ site }}</label>
+                <div class="input-wrapper">
+                    <input type="password" class="password-input" name="{{ site }}" placeholder="Enter secure access code">
+                    <button type="button" class="password-toggle">👁️</button>
+                </div>
+                <div class="password-strength">
+                    <div class="strength-meter"></div>
+                </div>
+            </div>
+            {% endfor %}
+            
+            <button type="submit" class="submit-button">Verify Access</button>
+        </form>
+        
+        <!-- Status indicators -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>SECURE CONNECTION</span>
+            </div>
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>ENCRYPTION ACTIVE</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        const toggleBtns = document.querySelectorAll('.password-toggle');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.textContent = '🔒';
+                } else {
+                    input.type = 'password';
+                    this.textContent = '👁️';
+                }
+            });
+        });
+        
+        // Password strength meter
+        const passwordInputs = document.querySelectorAll('.password-input');
+        passwordInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                const strength = this.value.length;
+                const strengthMeter = this.parentElement.nextElementSibling.querySelector('.strength-meter');
+                
+                if (strength === 0) {
+                    strengthMeter.style.width = '0%';
+                    strengthMeter.style.backgroundColor = '#333';
+                } else if (strength < 4) {
+                    strengthMeter.style.width = '25%';
+                    strengthMeter.style.backgroundColor = '#ff3860';
+                } else if (strength < 8) {
+                    strengthMeter.style.width = '50%';
+                    strengthMeter.style.backgroundColor = '#ffdd57';
+                } else if (strength < 12) {
+                    strengthMeter.style.width = '75%';
+                    strengthMeter.style.backgroundColor = '#48c774';
+                } else {
+                    strengthMeter.style.width = '100%';
+                    strengthMeter.style.backgroundColor = '#00ffe1';
+                }
+            });
+        });
+        
+        // Dynamic data lines
+        const dataLines = document.querySelector('.data-lines');
+        for (let i = 0; i < 10; i++) {
+            const line = document.createElement('div');
+            line.classList.add('data-line');
+            line.style.animationDelay = `${Math.random() * 8}s`;
+            line.style.top = `${Math.random() * 100}%`;
+            dataLines.appendChild(line);
+        }
+    </script>
 </body>
 </html>
