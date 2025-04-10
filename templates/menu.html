@@ -4,99 +4,415 @@
     <meta charset="UTF-8">
     <title>Cyber Game Menu</title>
     <style>
-        /* 🔮 Background & base styles */
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-color: #0a0a12;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(46, 12, 80, 0.3) 0%, transparent 60%),
+                linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             color: #f8f8f2;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Rajdhani', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             margin: 0;
-            cursor: url('https://cur.cursors-4u.net/cursors/cur-13/cur1163.cur'), auto; /* 💡 Neon cursor */
+            overflow: hidden;
+            position: relative;
+            cursor: url('https://cur.cursors-4u.net/cursors/cur-13/cur1163.cur'), auto;
         }
-
-        /* 🔮 Glitchy Title */
+        
+        /* Grid overlay effect */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(rgba(15, 15, 30, 0.1) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(15, 15, 30, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            animation: gridMove 60s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 40px; }
+        }
+        
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: rgba(0, 255, 225, 0.5);
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+        
+        /* Container */
+        .container {
+            background: rgba(15, 12, 41, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 225, 0.3);
+            border-radius: 15px;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90%;
+            width: 500px;
+            box-shadow: 0 0 40px rgba(0, 255, 225, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+        
+        /* Scan effect */
+        .container::after {
+            content: "";
+            position: absolute;
+            top: -150%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                rgba(0, 255, 225, 0),
+                rgba(0, 255, 225, 0.08),
+                rgba(0, 255, 225, 0)
+            );
+            transform: rotate(45deg);
+            animation: scan 6s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes scan {
+            0% { top: -150%; }
+            100% { top: 150%; }
+        }
+        
+        /* Glitchy Title */
         @keyframes glitch {
-            0% { text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7; }
-            25% { text-shadow: -2px 2px #00fff7, 2px -2px #ff00c8; }
-            50% { text-shadow: 2px -2px #ff00c8, -2px 2px #00fff7; }
-            75% { text-shadow: -1px -1px #ff00c8, 1px 1px #00fff7; }
-            100% { text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7; }
+            0% { 
+                text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7;
+                transform: translate(0);
+            }
+            25% { 
+                text-shadow: -2px 2px #00fff7, 2px -2px #ff00c8;
+                transform: translate(-2px, 1px);
+            }
+            50% { 
+                text-shadow: 2px -2px #ff00c8, -2px 2px #00fff7;
+                transform: translate(0);
+            }
+            75% { 
+                text-shadow: -1px -1px #ff00c8, 1px 1px #00fff7;
+                transform: translate(2px, -1px);
+            }
+            100% { 
+                text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7; 
+                transform: translate(0);
+            }
         }
-
-        h1 {
-            color: #ff00ff;
-            text-shadow: 2px 2px #000;
+        
+        .title-wrapper {
+            position: relative;
             margin-bottom: 2rem;
-            font-size: 3rem;
-            animation: glitch 1.2s infinite; /* 🌀 Apply glitch animation */
+            text-align: center;
         }
-
+        
+        h1 {
+            color: #fff;
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+            position: relative;
+            animation: glitch 3s infinite;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            color: #00ffe1;
+            font-size: 1rem;
+            letter-spacing: 4px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            position: relative;
+        }
+        
+        /* Decorative elements */
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffe1;
+            opacity: 0.8;
+        }
+        
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .corner-tr {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .corner-bl {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+        
+        /* Button container */
         .button-container {
             display: flex;
             flex-direction: column;
-            align-items: center; /* 👈 Centers child elements horizontally */
-            justify-content: center;
-            gap: 1.2rem;
+            align-items: center;
+            width: 100%;
+            gap: 1.5rem;
+            margin-top: 1rem;
         }
         
-
-        form button {
-            background: #1f1c2c;
+        form {
+            width: 100%;
+        }
+        
+        button {
+            background: rgba(15, 12, 41, 0.7);
             color: #00ffe1;
             border: 2px solid #00ffe1;
             padding: 1rem;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: 0.3s ease;
-            box-shadow: 0 0 10px #00ffe1;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 225, 0.5);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-
-        /* 🌀 Button shake animation */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-3px); }
-            40% { transform: translateX(3px); }
-            60% { transform: translateX(-3px); }
-            80% { transform: translateX(3px); }
+        
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(0, 255, 225, 0.2),
+                transparent
+            );
+            transition: 0.5s;
         }
-
-        form button:hover {
-            background: #00ffe1;
-            color: #1f1c2c;
-            box-shadow: 0 0 20px #00ffe1;
-            animation: shake 0.3s ease; /* 🌀 Apply shake on hover */
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            background: rgba(0, 255, 225, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 225, 0.8);
+            transform: translateY(-3px);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        /* Icons */
+        .icon {
+            display: inline-block;
+            font-size: 1.2rem;
+            margin-right: 5px;
+        }
+        
+        /* Pulse effect */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(0, 255, 225, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 225, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(0, 255, 225, 0.5); }
+        }
+        
+        /* Status indicator */
+        .status {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.8rem;
+            color: #00ffe1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00ffe1;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        /* Audio controls */
+        .audio-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 12, 41, 0.7);
+            border: 1px solid rgba(0, 255, 225, 0.3);
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
     </style>
 </head>
 <body>
+    <!-- Floating particles -->
+    <div class="particles">
+        <div class="particle" style="left:10%; animation-duration: 10s; animation-delay: 0s;"></div>
+        <div class="particle" style="left:20%; animation-duration: 12s; animation-delay: 1s;"></div>
+        <div class="particle" style="left:35%; animation-duration: 7s; animation-delay: 2s;"></div>
+        <div class="particle" style="left:55%; animation-duration: 14s; animation-delay: 0.5s;"></div>
+        <div class="particle" style="left:65%; animation-duration: 9s; animation-delay: 1.5s;"></div>
+        <div class="particle" style="left:75%; animation-duration: 8s; animation-delay: 3s;"></div>
+        <div class="particle" style="left:85%; animation-duration: 11s; animation-delay: 2.5s;"></div>
+        <div class="particle" style="left:90%; animation-duration: 10s; animation-delay: 1s;"></div>
+        <div class="particle" style="left:15%; animation-duration: 13s; animation-delay: 2s;"></div>
+        <div class="particle" style="left:45%; animation-duration: 8s; animation-delay: 1.5s;"></div>
+    </div>
 
-    <h1>🎮 PYCOD PROJECT</h1>
-
-<div class="button-container">
-    <form action="{{ url_for('menu.game1') }}" method="get">
-        <button type="submit">Start Password Cracking</button>
-    </form>
-    <form action="{{ url_for('menu.save_game') }}" method="get">
-        <button type="submit">💾 Save Game</button>
-    </form>
-    <form action="{{ url_for('menu.end_game') }}" method="get">
-        <button type="submit">🛑 End Game</button>
-    </form>
-</div>
-
-
-
-    <!-- 🎶 Background music -->
-    <audio autoplay loop hidden>
+    <div class="container">
+        <!-- Decorative corners -->
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        
+        <div class="title-wrapper">
+            <h1>🎮 PYCOD</h1>
+            <div class="subtitle">Project v2.0</div>
+        </div>
+        
+        <div class="button-container">
+            <form action="{{ url_for('menu.game1') }}" method="get">
+                <button type="submit"><span class="icon">⚡</span> START PASSWORD CRACKING</button>
+            </form>
+            <form action="{{ url_for('menu.save_game') }}" method="get">
+                <button type="submit"><span class="icon">💾</span> SAVE GAME</button>
+            </form>
+            <form action="{{ url_for('menu.end_game') }}" method="get">
+                <button type="submit"><span class="icon">🛑</span> END GAME</button>
+            </form>
+        </div>
+        
+        <!-- Status indicator -->
+        <div class="status">
+            <div class="status-dot"></div>
+            <span>SYSTEM ONLINE</span>
+        </div>
+    </div>
+    
+    <!-- Audio controls -->
+    <div class="audio-controls">
+        <span id="audio-icon">🔊</span>
+        <span>SYNTH</span>
+    </div>
+    
+    <!-- Background music -->
+    <audio id="bgMusic" autoplay loop>
         <source src="{{ url_for('static', filename='synth.mp3') }}" type="audio/mpeg">
     </audio>
     
-    
+    <script>
+        // Add audio toggle functionality
+        const audioControls = document.querySelector('.audio-controls');
+        const audioIcon = document.getElementById('audio-icon');
+        const bgMusic = document.getElementById('bgMusic');
+        
+        audioControls.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                audioIcon.textContent = '🔊';
+            } else {
+                bgMusic.pause();
+                audioIcon.textContent = '🔇';
+            }
+        });
+        
+        // Randomly position particles
+        document.addEventListener('DOMContentLoaded', () => {
+            const particles = document.querySelectorAll('.particle');
+            particles.forEach(particle => {
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+            });
+        });
+    </script>
 </body>
 </html>
