@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Map</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f, #1a1a2e);
+            color: #00ffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .map-button {
+            background: none;
+            border: 2px solid #00ffff;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            color: #00ffff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 8px #00ffff;
+            animation: pulse 2s infinite;
+        }
+
+        .map-button:hover {
+            background-color: #00ffff;
+            color: #0f0f0f;
+            box-shadow: 0 0 15px #00ffff;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .neon-border {
+            border: 4px double #00ffff;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 20px #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="neon-border">
+        <h1>Game Map</h1>
+        <div class="button-container">
+            <a href="{{ url_for('pswd_app.password_checker') }}">
+                <button class="map-button">🔐 Password Cracking</button>
+            </a>
+            <!-- Add more buttons here for other games -->
+        </div>
+    </div>
+</body>
+</html>
