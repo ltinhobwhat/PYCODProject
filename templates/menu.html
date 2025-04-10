@@ -357,19 +357,21 @@
             <div class="subtitle">Project v2.0</div>
         </div>
         
-        <div class="button-container">
-            <form action="{{ url_for('menu.game1') }}" method="get">
-                <button type="submit"><span class="icon">⚡</span> START PASSWORD CRACKING</button>
-            </form>
-            <form action="{{ url_for('menu.save_game') }}" method="get">
-                <button type="submit"><span class="icon">💾</span> SAVE GAME</button>
-            </form>
-            <form action="{{ url_for('menu.end_game') }}" method="get">
-                <button type="submit"><span class="icon">🛑</span> END GAME</button>
-            <form action="{{ url_for('map.map_page') }}" method="get">
-                <button type="submit"><span class="icon">🗺️</span> MAP</button>
-            </form>
-        </div>
+      <div class="button-container">
+    <form action="{{ url_for('menu.game1') }}" method="get">
+        <button type="submit"><span class="icon">⚡</span> START PASSWORD CRACKING</button>
+    </form>
+    <form action="{{ url_for('map.map_page') }}" method="get">
+        <button type="submit"><span class="icon">🗺️</span> MAP</button>
+    </form>
+    <form action="{{ url_for('menu.save_game') }}" method="get">
+        <button type="submit"><span class="icon">💾</span> SAVE GAME</button>
+    </form>
+    <form action="{{ url_for('menu.end_game') }}" method="get">
+        <button type="submit"><span class="icon">🛑</span> END GAME</button>
+    </form>
+</div>
+
         
         <!-- Status indicator -->
         <div class="status">
