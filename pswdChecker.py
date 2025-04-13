@@ -1,59 +1,78 @@
-from flask import Blueprint, render_template, request, session
-import hashlib
-import time
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Game Map</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f, #1a1a2e);
+            color: #00ffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-pswd_app = Blueprint('pswd_app', __name__)  
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
 
-sites = ["Banque SecurePlus", "Réseau Social ChatterBox", "Forum GeekZone"]
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
 
-def evaluate_password_strength(password):
-    score = 0
-    if len(password) >= 8: score += 1
-    if any(c.isupper() for c in password): score += 1
-    if any(c.isdigit() for c in password): score += 1
-    if any(c in "!@#$%^&*()-_+=<>?/;:" for c in password): score += 1
-    levels = ["💀 Très faible", "⚠️ Faible", "😐 Moyen", "🔐 Fort", "🔥 Très Fort"]
-    return levels[score]
+        .map-button {
+            background: none;
+            border: 2px solid #00ffff;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            color: #00ffff;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 8px #00ffff;
+            animation: pulse 2s infinite;
+        }
 
-def simulate_crack(password):
-    common_passwords = ["123456", "password", "qwerty", "azerty", "admin"]
-    time.sleep(1)
-    if password in common_passwords:
-        return "💀 Mot de passe CRACKÉ en 0.01s !"
-    elif len(password) < 6:
-        return "😬 Mot de passe trop court, cracké en 1 seconde."
-    else:
-        return "✅ Mot de passe sécurisé, crackage estimé : plusieurs années."
+        .map-button:hover {
+            background-color: #00ffff;
+            color: #0f0f0f;
+            box-shadow: 0 0 15px #00ffff;
+        }
 
-@pswd_app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        passwords = {}
-        evaluations = {}
-        crack_results = {}
-        for site in sites:
-            password = request.form.get(site)
-            passwords[site] = hashlib.sha256(password.encode()).hexdigest()
-            evaluations[site] = evaluate_password_strength(password)
-            crack_results[site] = simulate_crack(password)
-        session['passwords'] = passwords
-        session['memory_test'] = False
-        return render_template("memory_test.html", sites=sites)
-    return render_template("index.html", sites=sites)
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
 
-@pswd_app.route("/memory_test", methods=["POST"])
-def memory_test():
-    passwords = session.get('passwords', {})
-    score = 0
-    results = {}
-    for site in sites:
-        attempt = request.form.get(site)
-        if hashlib.sha256(attempt.encode()).hexdigest() == passwords.get(site):
-            results[site] = "✅ Mot de passe correct !"
-            score += 1
-        else:
-            results[site] = "❌ Mot de passe incorrect."
-    session.pop('passwords', None)
-    return render_template("result.html", results=results, score=score, total=len(sites))
+        .neon-border {
+            border: 4px double #00ffff;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 20px #00ffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="neon-border">
+        <h1>Game Map</h1>
+        <div class="button-container">
+<!-- Correct HTML: Button styled as a link -->
+<a class="map-button" href="{{ url_for('pswd_app.password_checker') }}">🔐 Password Cracking</a>
 
-    return render_template("result.html", results=results, score=score, total=len(sites))
+            <!-- Add more buttons here for other games -->
+        </div>
+    </div>
+</body>
+</html>
+
