@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Game Map</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
         body {
             margin: 0;
