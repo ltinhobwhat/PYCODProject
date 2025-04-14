@@ -9,4 +9,4 @@ def map_page():
 # Route to start the password checker minigame
 @map_bp.route('/minigame/password')
 def launch_password_game():
-    return render_template('pswd_checker.html')
+    return redirect(url_for('pswd_app.password_checker'))  # Redirect to the password checker route
