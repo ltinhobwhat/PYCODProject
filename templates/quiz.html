@@ -1,0 +1,21 @@
+<!-- templates/quiz.html -->
+{% extends "base.html" %}
+
+{% block title %}CIA Quiz{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>CIA Triad Quiz</h1>
+        <form method="post" action="#">
+            {% for question in questions %}
+                <div class="question-block">
+                    <p><strong>{{ question.text }}</strong></p>
+                    <label><input type="checkbox" name="q{{ loop.index0 }}" value="confidentiality"> Confidentiality</label><br>
+                    <label><input type="checkbox" name="q{{ loop.index0 }}" value="integrity"> Integrity</label><br>
+                    <label><input type="checkbox" name="q{{ loop.index0 }}" value="availability"> Availability</label><br><br>
+                </div>
+            {% endfor %}
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+{% endblock %}
