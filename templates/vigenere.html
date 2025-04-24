@@ -58,10 +58,14 @@
 <div class="container">
     <h1>Vigenère Challenge</h1>
     <p>Encrypted word: <strong>{{ encrypted }}</strong></p>
+    <p>Key: <strong>{{ key }}</strong></p>
     <form method="post">
         <input type="hidden" name="original" value="{{ original }}">
         <input type="text" name="guess" placeholder="Your guess (decrypted word)" required>
         <button type="submit">Submit</button>
+        <input type="hidden" name="original" value="{{ original }}">
+    <input type="hidden" name="key" value="{{ key }}">
+    <input type="hidden" name="encrypted" value="{{ encrypted }}">
     </form>
     {% if result %}
         <div class="result">{{ result }}</div>
