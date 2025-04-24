@@ -3,7 +3,6 @@ from flask import Blueprint, render_template, request
 
 quiz_bp = Blueprint('quiz', __name__, template_folder='templates')
 
-# Base de questions : chaque question a une phrase + les bonnes réponses
 QUESTIONS = [
     {
         "text": "HTTPS uses encryption to protect data in transit.",
@@ -23,6 +22,13 @@ QUESTIONS = [
     }
 ]
 
-@quiz_bp.route('/')
+@quiz_bp.route('/', methods=["GET", "POST"])
 def index():
+    if request.method == "POST":
+        score = 0
+        for i, q in enumerate(QUESTIONS):
+            selected = request.form.getlist(f"q{i}")
+            if set(selected) == set(q["answers"]):
+                score += 1
+        return render_template("quiz.html", questions=QUESTIONS, score=score, total=len(QUESTIONS))
     return render_template("quiz.html", questions=QUESTIONS)
