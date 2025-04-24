@@ -1,11 +1,14 @@
 import random
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, session, redirect, url_for
 
+# Définition du blueprint
 vigenere_bp = Blueprint('vigenere', __name__, template_folder='templates')
 
+# Dictionnaires de mots et de clés
 WORDS = ["network", "security", "password", "cipher", "encryption", "attack", "firewall"]
 KEYS = ["key", "cipher", "alpha", "secure"]
 
+# Fonction de chiffrement Vigenère
 def vigenere_encrypt(text, key):
     encrypted = ""
     key = key.lower()
@@ -17,30 +20,44 @@ def vigenere_encrypt(text, key):
             encrypted += c
     return encrypted
 
+# Route principale du mini-jeu
 @vigenere_bp.route("/", methods=["GET", "POST"])
 def index():
+    if "score" not in session:
+        session["score"] = 0
+        session["total"] = 0
+
+    result = None  # Message affiché après soumission
+
     if request.method == "POST":
         user_guess = request.form.get("guess", "").lower()
         original = request.form.get("original")
         key = request.form.get("key")
         encrypted = request.form.get("encrypted")
+        session["total"] += 1
+
         if user_guess == original:
+            session["score"] += 1
             result = "✅ Correct!"
         else:
             result = f"❌ Wrong. The correct word was: <strong>{original}</strong>"
 
-        # Nouvel essai à chaque fois
-        new_word = random.choice(WORDS)
-        new_key = random.choice(KEYS)
-        new_encrypted = vigenere_encrypt(new_word, new_key)
-
-        return render_template("vigenere.html",
-                               encrypted=new_encrypted,
-                               original=new_word,
-                               key=new_key,
-                               result=result)
-
+    # Nouveau mot/chiffrement à chaque chargement
     word = random.choice(WORDS)
     key = random.choice(KEYS)
     encrypted = vigenere_encrypt(word, key)
-    return render_template("vigenere.html", encrypted=encrypted, original=word, key=key)
+
+    return render_template("vigenere.html",
+                           encrypted=encrypted,
+                           original=word,
+                           key=key,
+                           result=result,
+                           score=session["score"],
+                           total=session["total"])
+
+# Route pour réinitialiser le score
+@vigenere_bp.route("/reset")
+def reset_score():
+    session["score"] = 0
+    session["total"] = 0
+    return redirect(url_for('vigenere.index'))
