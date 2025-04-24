@@ -68,7 +68,7 @@
     <input type="hidden" name="encrypted" value="{{ encrypted }}">
     </form>
     {% if result %}
-        <div class="result">{{ result }}</div>
+        <div class="result">{{ result|safe }}</div>
     {% endif %}
 </div>
 
