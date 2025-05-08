@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SQL Injection Trainer</title>
+    <style>
+        body { background: #0f0c29; color: #00ffe1; font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column; }
+        .container { background: rgba(15,12,41,0.8); padding: 2rem; border-radius: 10px; border: 1px solid #00ffe1; text-align: center; width: 400px; }
+        input, button { width: 80%; margin: 5px; padding: 10px; border-radius: 5px; }
+        .success { color: lightgreen; margin-top: 1rem; }
+        .fail { color: red; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>SQL Injection Trainer</h1>
+    <p><strong>Level {{ level }}:</strong> {{ hint }}</p>
+    <form method="post">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit">Login</button>
+    </form>
+
+    {% if query %}
+        <p><strong>Simulated Query:</strong></p>
+        <pre>{{ query }}</pre>
+        {% if result %}
+            <p class="{{ 'success' if success else 'fail' }}">{{ result }}</p>
+        {% endif %}
+    {% endif %}
+
+    <p style="margin-top: 1rem;">
+        <a href="{{ url_for('menu.menu') }}" style="color: #00ffe1; text-decoration: underline;">⬅️ Back to Menu</a>
+    </p>
+    <p style="margin-top: 0.5rem;">
+        <a href="{{ url_for('sqlinjector.reset_levels') }}" style="color: #00ffe1; text-decoration: underline;">🔄 Reset Levels</a>
+    </p>    
+</div>
+</body>
+</html>

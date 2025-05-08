@@ -376,7 +376,17 @@
     <form action="{{ url_for('vigenere.index') }}" method="get">
         <button type="submit"><span class="icon">🔐</span> VIGENÈRE CHALLENGE</button>
     </form>
+    <form action="{{ url_for('hashgame.index') }}" method="get">
+        <button type="submit"><span class="icon">🔑</span> HASH GUESS</button>
+    </form>
+    <form action="{{ url_for('sqlinjector.index') }}" method="get">
+        <button type="submit"><span class="icon">💉</span> SQL INJECTION TRAINER</button>
+    </form>
+    <form action="{{ url_for('sqlinjector.defender') }}" method="get">
+        <button type="submit"><span class="icon">🛡️</span> SQL DEFENDER</button>
+    </form>
     
+
 </div>
 
         
