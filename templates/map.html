@@ -109,6 +109,31 @@
             top: 45%;
             left: 35%;
         }
+
+        .location-quiz {
+            top: 25%;
+            left: 65%;
+        }
+
+        .location-vigenere {
+            top: 65%;
+            left: 25%;
+        }
+
+        .location-hash {
+            top: 65%;
+            left: 65%;
+        }
+
+        .location-sql {
+            top: 25%;
+            left: 25%;
+        }
+
+        .location-sqldef {
+            top: 45%;
+            left: 75%;
+        }
         
         .location-pulse {
             position: absolute;
@@ -381,6 +406,42 @@
                 <div class="location-icon">🔐</div>
                 <div class="location-label">Password District</div>
             </a>
+
+            <!-- CIA Quiz -->
+            <a href="{{ url_for('map.launch_quiz') }}" class="location location-quiz">
+                <div class="location-pulse"></div>
+                <div class="location-icon">🧠</div>
+                <div class="location-label">CIA Quiz</div>
+            </a>
+
+            <!-- Vigenère Challenge -->
+            <a href="{{ url_for('map.launch_vigenere') }}" class="location location-vigenere">
+                <div class="location-pulse"></div>
+                <div class="location-icon">🔐</div>
+                <div class="location-label">Vigenère</div>
+            </a>
+
+            <!-- Hash Guess -->
+            <a href="{{ url_for('map.launch_hashgame') }}" class="location location-hash">
+                <div class="location-pulse"></div>
+                <div class="location-icon">🔑</div>
+                <div class="location-label">Hash Guess</div>
+            </a>
+
+            <!-- SQL Injection -->
+            <a href="{{ url_for('map.launch_sqlinjector') }}" class="location location-sql">
+                <div class="location-pulse"></div>
+                <div class="location-icon">💉</div>
+                <div class="location-label">SQL Injection</div>
+            </a>
+
+            <!-- SQL Defender -->
+            <a href="{{ url_for('map.launch_sqldefender') }}" class="location location-sqldef">
+                <div class="location-pulse"></div>
+                <div class="location-icon">🛡️</div>
+                <div class="location-label">SQL Defender</div>
+
+            </a>
         </div>
     </div>
     
@@ -425,18 +486,21 @@
             const locations = document.querySelectorAll('.location');
             locations.forEach(location => {
                 location.addEventListener('mouseenter', function() {
-                    const gameArea = document.querySelector('.game-area-password');
-                    gameArea.style.opacity = '0.8';
-                    gameArea.style.borderColor = 'rgba(0, 255, 255, 0.8)';
+                    const gameArea = this.querySelector('.game-area');
+                    if (gameArea) {
+                        gameArea.style.opacity = '0.8';
+                        gameArea.style.borderColor = 'rgba(0, 255, 255, 0.8)';
+                    }
                 });
                 
                 location.addEventListener('mouseleave', function() {
-                    const gameArea = document.querySelector('.game-area-password');
-                    gameArea.style.opacity = '0.5';
-                    gameArea.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                    const gameArea = this.querySelector('.game-area');
+                    if (gameArea) {
+                        gameArea.style.opacity = '0.5';
+                        gameArea.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                    }
                 });
             });
-        });
     </script>
 </body>
 </html>
