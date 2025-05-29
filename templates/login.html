@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEURAL LINK - ACCESS POINT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 25%, #16213e 50%, #0f3460 75%, #0a0a0a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffff;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 8s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(10, 10, 20, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid transparent;
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 50px rgba(0, 255, 255, 0.2),
+                inset 0 0 20px rgba(0, 255, 255, 0.05);
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+            border-radius: 20px;
+            padding: 2px;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            animation: borderGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .system-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 24px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px #00ffff;
+            animation: titleGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 20px #00ffff; }
+            100% { text-shadow: 0 0 30px #00ffff, 0 0 40px #00ffff; }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .alert {
+            background: rgba(255, 0, 100, 0.2);
+            border: 1px solid #ff0064;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #ff6b9d;
+            text-align: center;
+            font-weight: 500;
+            animation: alertPulse 1s ease-in-out;
+        }
+
+        @keyframes alertPulse {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 16px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 300;
+        }
+
+        .form-input:focus {
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        .form-input:focus + .input-glow {
+            opacity: 1;
+        }
+
+        .input-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 10px;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .access-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #00ffff, #0080ff);
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .access-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .access-btn:hover::before {
+            left: 100%;
+        }
+
+        .access-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+            background: linear-gradient(45deg, #00ffff, #00aaff);
+        }
+
+        .access-btn:active {
+            transform: translateY(0);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .signup-link a {
+            color: #ff00ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .signup-link a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #ff00ff;
+            transition: width 0.3s ease;
+        }
+
+        .signup-link a:hover::after {
+            width: 100%;
+        }
+
+        .signup-link a:hover {
+            color: #ff66ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 10px;
+            }
+            
+            .login-box {
+                padding: 30px 20px;
+            }
+            
+            .system-title {
+                font-size: 20px;
+            }
+        }
+
+        /* Scan line effect */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(400px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 80%; animation-delay: 7s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 8s;"></div>
+
+    <div class="login-container">
+        <div class="login-box">
+            <div class="scan-line"></div>
+            
+            <h1 class="system-title">Neural Link</h1>
+            <p class="subtitle">Access Terminal v2.7.4</p>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert">
+                        {{ messages[0] }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" action="{{ url_for('auth.login') }}">
+                <div class="form-group">
+                    <input type="text" name="username" class="form-input" placeholder="USER ID" required>
+                    <div class="input-glow"></div>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" name="password" class="form-input" placeholder="ACCESS CODE" required>
+                    <div class="input-glow"></div>
+                </div>
+                
+                <button type="submit" class="access-btn">
+                    Initialize Connection
+                </button>
+            </form>
+            
+            <div class="signup-link">
+                <p>New user? <a href="{{ url_for('auth.signup') }}">Register Neural ID</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create additional floating particles dynamically
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                document.body.appendChild(particle);
+                
+                // Remove particle after animation
+                setTimeout(() => {
+                    particle.remove();
+                }, 10000);
+            }
+            
+            // Create particles periodically
+            setInterval(createParticle, 800);
+            
+            // Add typing effect to inputs
+            const inputs = document.querySelectorAll('.form-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value.length > 0) {
+                        this.style.borderColor = '#00ffff';
+                        this.style.boxShadow = '0 0 15px rgba(0, 255, 255, 0.3)';
+                    } else {
+                        this.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                        this.style.boxShadow = 'none';
+                    }
+                });
+            });
+            
+            // Add button click effect
+            const accessBtn = document.querySelector('.access-btn');
+            accessBtn.addEventListener('click', function() {
+                this.style.background = 'linear-gradient(45deg, #ff00ff, #00ffff)';
+                setTimeout(() => {
+                    this.style.background = 'linear-gradient(45deg, #00ffff, #0080ff)';
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>

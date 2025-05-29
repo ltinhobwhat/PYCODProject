@@ -328,6 +328,134 @@
             align-items: center;
             gap: 5px;
         }
+
+        /* Cyber modal styles */
+        .cyber-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #0a0a12;
+            border: 1px solid #00ffe1;
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0, 255, 225, 0.5);
+        }
+
+        .close {
+            color: #00ffe1;
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .save-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 255, 225, 0.3);
+            margin-bottom: 10px;
+        }
+
+        /* Login/Signup forms */
+        .cyber-container {
+            background: rgba(15, 12, 41, 0.7);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .cyber-input {
+            margin-bottom: 1rem;
+        }
+
+        .cyber-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00ffe1;
+        }
+
+        .cyber-input input {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffe1;
+            color: white;
+        }/* Cyber modal styles */
+        .cyber-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #0a0a12;
+            border: 1px solid #00ffe1;
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 0 20px rgba(0, 255, 225, 0.5);
+        }
+
+        .close {
+            color: #00ffe1;
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .save-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 255, 225, 0.3);
+            margin-bottom: 10px;
+        }
+
+        /* Login/Signup forms */
+        .cyber-container {
+            background: rgba(15, 12, 41, 0.7);
+            padding: 2rem;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .cyber-input {
+            margin-bottom: 1rem;
+        }
+
+        .cyber-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00ffe1;
+        }
+
+        .cyber-input input {
+            width: 100%;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffe1;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -357,6 +485,14 @@
             <div class="subtitle">Project v2.0</div>
         </div>
         
+        <div class="user-status">
+            {% if current_user.is_authenticated %}
+                Welcome, {{ current_user.username }}!
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Login</a>
+            {% endif %}
+        </div>
       <div class="button-container">
     <form action="{{ url_for('menu.game1') }}" method="get">
         <button type="submit"><span class="icon">⚡</span> START PASSWORD CRACKING</button>
@@ -385,8 +521,13 @@
     <form action="{{ url_for('sqlinjector.defender') }}" method="get">
         <button type="submit"><span class="icon">🛡️</span> SQL DEFENDER</button>
     </form>
-    
+    <form action="{{ url_for('auth.login') }}" method="get">
+        <button type="submit"><span class="icon">👤</span> LOGIN</button>
+    </form>
+    <button id="saveGameBtn"><span class="icon">💾</span> SAVE GAME</button>
+    <button id="loadGameBtn"><span class="icon">⏮</span> LOAD GAME</button>
 
+    {% include 'save_load_modal.html' %}
 </div>
 
         
@@ -407,7 +548,7 @@
     <audio id="bgMusic" autoplay loop>
         <source src="{{ url_for('static', filename='synth.mp3') }}" type="audio/mpeg">
     </audio>
-    
+    {% include 'save_load_modal.html' %}
     <script>
         // Add audio toggle functionality
         const audioControls = document.querySelector('.audio-controls');
@@ -435,5 +576,8 @@
             });
         });
     </script>
+    
+    <script src="{{ url_for('static', filename='js/saves.js') }}"></script>
+
 </body>
 </html>
