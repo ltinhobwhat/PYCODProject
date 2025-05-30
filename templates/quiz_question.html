@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+</head>
+<body>
+    <h2>Question {{ index }} / {{ total }}</h2>
+
+    <form method="POST">
+        <p>{{ question.text }}</p>
+        {% for answer in ["confidentiality", "integrity", "availability"] %}
+            <label>
+                <input type="checkbox" name="answer" value="{{ answer }}">
+                {{ answer.capitalize() }}
+            </label><br>
+        {% endfor %}
+        <br>
+        <button type="submit">Suivant</button>
+    </form>
+</body>
+</html>

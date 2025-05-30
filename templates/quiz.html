@@ -84,6 +84,13 @@
         You scored <strong>{{ score }}</strong> out of <strong>{{ total }}</strong>!
     </p>
     {% endif %}
+    {% if score is defined %}
+<div style="margin-bottom: 1rem;">
+    <div style="background: #333; border-radius: 10px; overflow: hidden; height: 20px;">
+        <div style="width: {{ (score / total * 100)|round(0, 'floor') }}%; background: #00ffe1; height: 100%; transition: width 0.5s;"></div>
+    </div>
+</div>
+{% endif %}
     <form method="post">
         {% for question in questions %}
             <div class="question-block">
