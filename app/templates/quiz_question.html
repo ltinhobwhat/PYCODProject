@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .progress { height: 20px; background: #ddd; border-radius: 10px; margin-bottom: 20px; }
+        .progress-bar {
+            height: 100%;
+            background: #4caf50;
+            border-radius: 10px;
+            width: {{ (index / total) * 100 }}%;
+            transition: width 0.3s ease;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>Question {{ index }} / {{ total }}</h2>
+    <div class="progress"><div class="progress-bar"></div></div>
+
+    <form method="POST">
+        <p><strong>{{ question.text }}</strong></p>
+        {% for option in ["confidentiality", "integrity", "availability"] %}
+            <label>
+                <input type="checkbox" name="answer" value="{{ option }}">
+                {{ option.capitalize() }}
+            </label><br>
+        {% endfor %}
+        <button type="submit">Suivant</button>
+    </form>
+</body>
+</html>

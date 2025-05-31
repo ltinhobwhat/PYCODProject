@@ -2,8 +2,10 @@ import webbrowser
 import os
 import subprocess
 import time
-from main import app
 
+from app import create_app
+
+app = create_app()
 if __name__ == "__main__":
     try:
         # Minimize the command prompt window
