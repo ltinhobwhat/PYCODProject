@@ -2,6 +2,7 @@
 from flask import Flask
 from models import db  # Changed import
 from flask_login import LoginManager
+from saves import saves_bp
 
 # Initialize extensions
 
@@ -41,6 +42,7 @@ def create_app():
     app.register_blueprint(hashgame_bp, url_prefix="/hashgame")
     app.register_blueprint(sqlinjector_bp, url_prefix="/sqlinjector")
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(saves_bp, url_prefix='/saves')
 
     # Create tables
     with app.app_context():

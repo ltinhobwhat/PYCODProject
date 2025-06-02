@@ -1,8 +1,6 @@
-# saves.py
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session  # Added session import
 from flask_login import login_required, current_user
 from models import db, GameSave
-import json
 
 saves_bp = Blueprint('saves', __name__)
 
@@ -32,35 +30,19 @@ def save_game():
         save_name=save_name
     ).first()
     
+    game_state = get_game_state()
+    
     if existing_save:
-        existing_save.save_data = get_game_state()
+        existing_save.save_data = game_state
     else:
         new_save = GameSave(
             user_id=current_user.id,
             save_name=save_name,
-            save_data=get_game_state()
+            save_data=game_state
         )
         db.session.add(new_save)
     
     db.session.commit()
-    return jsonify({'status': 'success'})
-
-@saves_bp.route('/load/<int:save_id>', methods=['GET'])
-@login_required
-def load_game(save_id):
-    save = GameSave.query.filter_by(
-        id=save_id,
-        user_id=current_user.id
-    ).first_or_404()
-    
-    # Restore all game state
-    for game, data in save.save_data.items():
-        if game == 'current_levels':
-            for game_name, level in data.items():
-                session[game_name + '_level'] = level
-        else:
-            session[game_name] = data
-    
     return jsonify({'status': 'success'})
 
 @saves_bp.route('/list', methods=['GET'])

@@ -331,24 +331,37 @@
 
         /* Cyber modal styles */
         .cyber-modal {
-            display: none;
             position: fixed;
-            z-index: 100;
+            z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .modal-content {
-            background-color: #0a0a12;
+            background: rgba(15, 12, 41, 0.9);
             border: 1px solid #00ffe1;
-            margin: 10% auto;
-            padding: 20px;
-            width: 80%;
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
             max-width: 500px;
-            box-shadow: 0 0 20px rgba(0, 255, 225, 0.5);
+            box-shadow: 0 0 30px rgba(0, 255, 225, 0.5);
+        }
+
+        .cyber-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffe1;
+            color: white;
+            border-radius: 4px;
         }
 
         .close {
@@ -493,41 +506,31 @@
                 <a href="{{ url_for('auth.login') }}">Login</a>
             {% endif %}
         </div>
-      <div class="button-container">
-    <form action="{{ url_for('menu.game1') }}" method="get">
-        <button type="submit"><span class="icon">⚡</span> START PASSWORD CRACKING</button>
-    </form>
-    <form action="{{ url_for('map.map_page') }}" method="get">
-        <button type="submit"><span class="icon">🗺️</span> MAP</button>
-    </form>
-    <form action="{{ url_for('menu.save_game') }}" method="get">
-        <button type="submit"><span class="icon">💾</span> SAVE GAME</button>
-    </form>
-    <form action="{{ url_for('menu.end_game') }}" method="get">
-        <button type="submit"><span class="icon">🛑</span> END GAME</button>
-    </form>
-    <form action="{{ url_for('quiz.index') }}" method="get">
-        <button type="submit"><span class="icon">🧠</span> CIA TRIAD QUIZ</button>
-    </form>
-    <form action="{{ url_for('vigenere.index') }}" method="get">
-        <button type="submit"><span class="icon">🔐</span> VIGENÈRE CHALLENGE</button>
-    </form>
-    <form action="{{ url_for('hashgame.index') }}" method="get">
-        <button type="submit"><span class="icon">🔑</span> HASH GUESS</button>
-    </form>
-    <form action="{{ url_for('sqlinjector.index') }}" method="get">
-        <button type="submit"><span class="icon">💉</span> SQL INJECTION TRAINER</button>
-    </form>
-    <form action="{{ url_for('sqlinjector.defender') }}" method="get">
-        <button type="submit"><span class="icon">🛡️</span> SQL DEFENDER</button>
-    </form>
-    <form action="{{ url_for('auth.login') }}" method="get">
-        <button type="submit"><span class="icon">👤</span> LOGIN</button>
-    </form>
-    <button id="saveGameBtn"><span class="icon">💾</span> SAVE GAME</button>
-    <button id="loadGameBtn"><span class="icon">⏮</span> LOAD GAME</button>
-
-    {% include 'save_load_modal.html' %}
+     <div class="button-container">
+        <!-- Map Button -->
+        <form action="{{ url_for('map.map_page') }}" method="get">
+            <button type="submit"><span class="icon">🗺️</span> MAP</button>
+        </form>
+        
+        <!-- Save Game Button -->
+        <button id="saveGameBtn"><span class="icon">💾</span> SAVE GAME</button>
+        
+        <!-- End Game Button -->
+        <form action="{{ url_for('menu.end_game') }}" method="get">
+            <button type="submit"><span class="icon">🛑</span> END GAME</button>
+        </form>
+        
+        <!-- Login/Logout Button -->
+        {% if current_user.is_authenticated %}
+            <form action="{{ url_for('auth.logout') }}" method="post">
+                <button type="submit"><span class="icon">🚪</span> LOGOUT</button>
+            </form>
+        {% else %}
+            <form action="{{ url_for('auth.login') }}" method="get">
+                <button type="submit"><span class="icon">👤</span> LOGIN</button>
+            </form>
+        {% endif %}
+    </div>
 </div>
 
         
@@ -543,6 +546,16 @@
         <span id="audio-icon">🔊</span>
         <span>SYNTH</span>
     </div>
+
+     <div class="cyber-modal" id="saveModal" style="display:none;">
+        <div class="modal-content">
+            <h2>SAVE GAME</h2>
+            <input type="text" id="saveName" placeholder="Save name (default: Autosave)" class="cyber-input">
+            <button id="confirmSave" class="cyber-button">CONFIRM SAVE</button>
+            <div id="saveStatus" style="margin-top: 15px; color: #00ffe1;"></div>
+        </div>
+    </div>
+</div>
     
     <!-- Background music -->
     <audio id="bgMusic" autoplay loop>
@@ -577,6 +590,49 @@
         });
     </script>
     
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const saveBtn = document.getElementById('saveGameBtn');
+        const modal = document.getElementById('saveModal');
+        const confirmBtn = document.getElementById('confirmSave');
+        const saveNameInput = document.getElementById('saveName');
+        const saveStatus = document.getElementById('saveStatus');
+        
+        saveBtn.addEventListener('click', () => {
+            modal.style.display = 'block';
+        });
+        
+        confirmBtn.addEventListener('click', () => {
+            const saveName = saveNameInput.value || 'Autosave';
+            saveStatus.textContent = "Saving game...";
+            
+            fetch('/saves/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `save_name=${encodeURIComponent(saveName)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    saveStatus.innerHTML = "✅ Game saved successfully!";
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        saveStatus.textContent = "";
+                    }, 2000);
+                } else {
+                    saveStatus.textContent = "❌ Error saving game";
+                }
+            })
+            .catch(error => {
+                saveStatus.textContent = "❌ Network error";
+                console.error('Error:', error);
+            });
+        });
+    });
+    </script>
+
     <script src="{{ url_for('static', filename='js/saves.js') }}"></script>
 
 </body>
