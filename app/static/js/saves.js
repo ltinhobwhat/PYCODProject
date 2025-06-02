@@ -1,36 +1,64 @@
 // static/js/saves.js
 document.addEventListener('DOMContentLoaded', function() {
+    const saveBtn = document.getElementById('saveGameBtn');
+    const modal = document.getElementById('saveModal');
+    const confirmBtn = document.getElementById('confirmSave');
+    const saveNameInput = document.getElementById('saveName');
+    const saveStatus = document.getElementById('saveStatus');
+    
     // Save game functionality
-    document.getElementById('saveGameBtn').addEventListener('click', function() {
-        document.getElementById('saveModal').style.display = 'block';
+    saveBtn.addEventListener('click', function() {
+        modal.style.display = 'block';
     });
     
-    document.getElementById('confirmSave').addEventListener('click', function() {
-        const saveName = document.getElementById('saveName').value || 'Autosave';
+    confirmBtn.addEventListener('click', function() {
+        const saveName = saveNameInput.value || 'Autosave';
+        saveStatus.textContent = "Saving game...";
         
-        fetch('/save', {
+        fetch('/saves/save', {  // Fixed endpoint
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: `save_name=${encodeURIComponent(saveName)}`
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if(data.status === 'success') {
-                alert('Game saved successfully!');
-                document.getElementById('saveModal').style.display = 'none';
-                loadSaveList();
+                saveStatus.textContent = "✅ Game saved successfully!";
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                    saveStatus.textContent = "";
+                }, 2000);
+                loadSaveList(); // Refresh the save list
+            } else {
+                throw new Error(data.message || 'Unknown error from server');
             }
+        })
+        .catch(error => {
+            console.error('Save error:', error);
+            saveStatus.textContent = `❌ Error: ${error.message}`;
         });
     });
     
     // Load save list
     function loadSaveList() {
-        fetch('/list')
-        .then(response => response.json())
+        fetch('/saves/list')  // Fixed endpoint
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(saves => {
             const saveList = document.getElementById('saveList');
+            if (!saveList) return;
+            
             saveList.innerHTML = '';
             
             saves.forEach(save => {
@@ -42,19 +70,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 saveList.appendChild(saveElement);
             });
+        })
+        .catch(error => {
+            console.error('Error loading saves:', error);
         });
     }
     
     // Load game function
     window.loadGame = function(saveId) {
-        fetch(`/load/${saveId}`)
-        .then(response => response.json())
+        fetch(`/saves/load/${saveId}`)  // Fixed endpoint
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if(data.status === 'success') {
                 alert('Game loaded!');
                 document.getElementById('saveModal').style.display = 'none';
                 location.reload(); // Refresh to show loaded state
+            } else {
+                throw new Error(data.message || 'Unknown error loading game');
             }
+        })
+        .catch(error => {
+            console.error('Load error:', error);
+            alert(`Error loading game: ${error.message}`);
         });
     }
     

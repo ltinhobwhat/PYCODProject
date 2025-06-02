@@ -1,14 +1,12 @@
 import random
 from flask import Blueprint, render_template, request, session, redirect, url_for
+from .save_manager import save_progress, get_progress
 
-# Définition du blueprint
 vigenere_bp = Blueprint('vigenere', __name__, template_folder='templates')
 
-# Dictionnaires de mots et de clés
 WORDS = ["network", "security", "password", "cipher", "encryption", "attack", "firewall"]
 KEYS = ["key", "cipher", "alpha", "secure"]
 
-# Fonction de chiffrement Vigenère
 def vigenere_encrypt(text, key):
     encrypted = ""
     key = key.lower()
@@ -20,14 +18,16 @@ def vigenere_encrypt(text, key):
             encrypted += c
     return encrypted
 
-# Route principale du mini-jeu
 @vigenere_bp.route("/", methods=["GET", "POST"])
 def index():
+    # Load previous progress
+    progress = get_progress('vigenere')
+    
     if "score" not in session:
         session["score"] = 0
         session["total"] = 0
 
-    result = None  # Message affiché après soumission
+    result = None
 
     if request.method == "POST":
         user_guess = request.form.get("guess", "").lower()
@@ -41,8 +41,21 @@ def index():
             result = "✅ Correct!"
         else:
             result = f"❌ Wrong. The correct word was: <strong>{original}</strong>"
+        
+        # Save progress after each attempt
+        current_percentage = (session["score"] / session["total"]) * 100
+        completed = session["score"] >= 5  # Complete after 5 correct answers
+        
+        save_progress(
+            game_name='vigenere',
+            score=session["score"],
+            completed=completed,
+            level=1,
+            accuracy=current_percentage,
+            total_attempts=session["total"]
+        )
 
-    # Nouveau mot/chiffrement à chaque chargement
+    # New word/encryption for each load
     word = random.choice(WORDS)
     key = random.choice(KEYS)
     encrypted = vigenere_encrypt(word, key)
@@ -53,9 +66,9 @@ def index():
                            key=key,
                            result=result,
                            score=session["score"],
-                           total=session["total"])
+                           total=session["total"],
+                           progress=progress)
 
-# Route pour réinitialiser le score
 @vigenere_bp.route("/reset")
 def reset_score():
     session["score"] = 0

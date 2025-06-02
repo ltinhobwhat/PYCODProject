@@ -1,4 +1,6 @@
+# Updated pswdChecker.py
 from flask import Blueprint, render_template, request, session
+from .save_manager import save_progress, get_progress
 import hashlib
 import time
 
@@ -27,6 +29,9 @@ def simulate_crack(password):
 
 @pswd_app.route("/", methods=["GET", "POST"])
 def index():
+    # Load previous progress
+    progress = get_progress('password_checker')
+    
     if request.method == "POST":
         passwords = {}
         evaluations = {}
@@ -39,7 +44,8 @@ def index():
         session['passwords'] = passwords
         session['memory_test'] = False
         return render_template("memory_test.html", sites=sites)
-    return render_template("index.html", sites=sites)
+    
+    return render_template("index.html", sites=sites, progress=progress)
 
 @pswd_app.route("/memory_test", methods=["POST"])
 def memory_test():
@@ -53,7 +59,20 @@ def memory_test():
             score += 1
         else:
             results[site] = "❌ Mot de passe incorrect."
+    
+    # Calculate final score and save progress
+    final_score = (score / len(sites)) * 100
+    completed = score == len(sites)
+    
+    # Save progress using SaveManager
+    save_progress(
+        game_name='password_checker',
+        score=int(final_score),
+        completed=completed,
+        level=1,
+        attempts=session.get('attempts', 0) + 1,
+        perfect_score=score == len(sites)
+    )
+    
     session.pop('passwords', None)
-    return render_template("result.html", results=results, score=score, total=len(sites))
-
     return render_template("result.html", results=results, score=score, total=len(sites))

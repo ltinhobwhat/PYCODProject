@@ -1,15 +1,17 @@
 from flask import Blueprint, render_template, request, redirect, session, url_for
+from .save_manager import save_progress, get_progress
 import random
 
 quiz_bp = Blueprint("quiz", __name__, template_folder="templates/quiz")
 
-# QUESTIONS = [...]  # Remplace ça par l'import ou la liste de tes questions
 from .questions_pool import QUESTIONS
-
 NUM_QUESTIONS = 10
 
 @quiz_bp.route("/", methods=["GET", "POST"])
 def index():
+    # Load previous progress
+    progress = get_progress('quiz')
+    
     if "quiz_questions" not in session or "quiz_index" not in session:
         num_to_pick = min(NUM_QUESTIONS, len(QUESTIONS))
         session["quiz_questions"] = random.sample(QUESTIONS, num_to_pick)
@@ -20,7 +22,6 @@ def index():
     quiz_questions = session["quiz_questions"]
     index = session.get("quiz_index", 0)
     total = len(quiz_questions)
-
 
     if request.method == "POST":
         user_answers = request.form.getlist("answer")
@@ -35,11 +36,29 @@ def index():
             return redirect(url_for("quiz.result"))
 
     question = quiz_questions[index]
-    return render_template("quiz_question.html", question=question, index=index + 1, total=total)
+    return render_template("quiz_question.html", question=question, index=index + 1, total=total, progress=progress)
 
 @quiz_bp.route("/result")
 def result():
     score = session.get("score", 0)
     total = len(session.get("quiz_questions", []))
-    session.clear()  # facultatif pour reset le quiz
+    
+    # Calculate percentage and save progress
+    percentage = (score / total) * 100
+    completed = percentage >= 70  # Consider 70% as completion threshold
+    
+    save_progress(
+        game_name='quiz',
+        score=int(percentage),
+        completed=completed,
+        level=1,
+        correct_answers=score,
+        total_questions=total
+    )
+    
+    session.pop('quiz_questions', None)
+    session.pop('quiz_index', None)
+    session.pop('score', None)
+    session.pop('answers', None)
+    
     return render_template("quiz_result.html", score=score, total=total)

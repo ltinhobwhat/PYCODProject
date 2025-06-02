@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, render_template, request, session, redirect, url_for
+from .save_manager import save_progress, get_progress
 
 sqlinjector_bp = Blueprint('sqlinjector', __name__, template_folder='templates')
 
@@ -10,8 +11,13 @@ LEVELS = {
 
 @sqlinjector_bp.route("/", methods=["GET", "POST"])
 def index():
+    # Load previous progress
+    progress = get_progress('sqlinjector')
+    
     if "level" not in session:
         session["level"] = 1
+    if "sql_attempts" not in session:
+        session["sql_attempts"] = 0
 
     success = False
     query = None
@@ -22,6 +28,7 @@ def index():
         username = request.form.get("username", "")
         password = request.form.get("password", "")
         query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}';"
+        session["sql_attempts"] += 1
 
         if level == 1 and ("' OR '1'='1" in username or "' OR '1'='1" in password):
             success = True
@@ -32,25 +39,52 @@ def index():
 
         if success:
             session["level"] += 1
-            if session["level"] > len(LEVELS):
+            completed = session["level"] > len(LEVELS)
+            
+            # Save progress
+            save_progress(
+                game_name='sqlinjector',
+                score=level * 33,  # 33 points per level
+                completed=completed,
+                level=level,
+                total_attempts=session["sql_attempts"]
+            )
+            
+            if completed:
                 session["level"] = 1  # reset after last level
-            result = "✅ Injection successful! Moving to next level."
+                result = "🎉 All levels completed! Game reset."
+            else:
+                result = "✅ Injection successful! Moving to next level."
         else:
             result = "❌ Injection failed. Try again!"
 
-        return render_template("sqlinjector.html", query=query, success=success, result=result, level=level, hint=hint)
+        return render_template("sqlinjector.html", 
+                             query=query, 
+                             success=success, 
+                             result=result, 
+                             level=level, 
+                             hint=hint,
+                             progress=progress)
 
-    return render_template("sqlinjector.html", query=query, success=success, level=level, hint=hint)
+    return render_template("sqlinjector.html", 
+                         query=query, 
+                         success=success, 
+                         level=level, 
+                         hint=hint,
+                         progress=progress)
+
 @sqlinjector_bp.route("/reset")
 def reset_levels():
     session["level"] = 1
+    session["sql_attempts"] = 0
     return redirect(url_for('sqlinjector.index'))
+
 @sqlinjector_bp.route("/defender", methods=["GET", "POST"])
 def defender():
     options = [
         "Use parameterized queries (prepared statements)",
         "Escape user input manually",
-        "Trust user input, it’s harmless"
+        "Trust user input, it's harmless"
     ]
     correct = "Use parameterized queries (prepared statements)"
     result = None
@@ -59,7 +93,15 @@ def defender():
         choice = request.form.get("defense_choice")
         if choice == correct:
             result = "✅ Correct! Always use prepared statements."
+            # Save defender completion
+            save_progress(
+                game_name='sql_defender',
+                score=100,
+                completed=True,
+                level=1
+            )
         else:
             result = "❌ Wrong. The safest way is to use parameterized queries."
 
-    return render_template("defender.html", options=options, result=result)
+    progress = get_progress('sql_defender')
+    return render_template("defender.html", options=options, result=result, progress=progress)
