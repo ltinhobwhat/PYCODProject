@@ -1,21 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>SQL Defense Trainer</title>
-    <style>
-        body { background: #0f0c29; color: #00ffe1; font-family: 'Rajdhani', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; flex-direction: column; }
-        .container { background: rgba(15,12,41,0.8); padding: 2rem; border-radius: 10px; border: 1px solid #00ffe1; text-align: center; width: 400px; }
-        button { width: 80%; margin: 5px; padding: 10px; border-radius: 5px; background: transparent; border: 2px solid #00ffe1; color: #00ffe1; font-weight: bold; cursor: pointer; }
-        button:hover { background: #00ffe1; color: #0f0c29; }
-        .result { margin-top: 1rem; }
-    </style>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}SQL Defense Trainer{% endblock %}
+
+{% block content %}
 <div class="container">
     <h1>SQL Defense Trainer</h1>
     <p>How would you protect this code?</p>
     <pre>SELECT * FROM users WHERE username = ? AND password = ?;</pre>
+
     <form method="post">
         {% for option in options %}
             <button type="submit" name="defense_choice" value="{{ option }}">{{ option }}</button><br>
@@ -27,8 +19,7 @@
     {% endif %}
 
     <p style="margin-top: 1rem;">
-        <a href="{{ url_for('menu.menu') }}" style="color: #00ffe1; text-decoration: underline;">⬅️ Back to Menu</a>
+        <a href="{{ url_for('menu.menu') }}">⬅️ Back to Menu</a>
     </p>
 </div>
-</body>
-</html>
+{% endblock %}
