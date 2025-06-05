@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -109,4 +109,20 @@
 </div>
 
 </body>
-</html>
+</html> -->
+{% extends 'base.html' %}
+
+{% block title %}Quiz{% endblock %}
+
+{% block style %}
+<style>
+    .question {
+        color: yellow;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="question">Quelle est la capitale de la cybersécurité ?</h1>
+{% endblock %}
