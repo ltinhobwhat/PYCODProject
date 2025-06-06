@@ -235,9 +235,12 @@ def dashboard():
         'sqldefender': {'name': 'SQL Defense', 'max_score': 1}
     }
     
-    # Calculate progress percentage safely
+    # Calculate progress percentage safely OUTSIDE the f-string
     progress_percentage = dashboard_data['progress_percentage']
-    progress_degrees = progress_percentage * 3.6
+    progress_degrees = int(progress_percentage * 3.6)  # Convert to integer to avoid decimal issues
+    
+    # Build CSS style string separately to avoid f-string issues
+    progress_css = f"conic-gradient(#00ff88 0deg, #00ff88 {progress_degrees}deg, rgba(255,255,255,0.2) {progress_degrees}deg)"
     
     return f'''
     <!DOCTYPE html>
@@ -245,75 +248,75 @@ def dashboard():
     <head>
         <title>My Progress Dashboard</title>
         <style>
-            body {{ 
+            body {{{{ 
                 font-family: 'Segoe UI', sans-serif; 
                 background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
                 color: white; 
                 padding: 2rem; 
                 margin: 0;
                 min-height: 100vh;
-            }}
-            .container {{ max-width: 1000px; margin: 0 auto; }}
-            h1 {{ color: #00ff88; text-align: center; font-size: 2.5rem; margin-bottom: 2rem; }}
-            .user-stats {{ 
+            }}}}
+            .container {{{{ max-width: 1000px; margin: 0 auto; }}}}
+            h1 {{{{ color: #00ff88; text-align: center; font-size: 2.5rem; margin-bottom: 2rem; }}}}
+            .user-stats {{{{ 
                 background: rgba(0,255,136,0.1); 
                 padding: 2rem; 
                 border-radius: 10px; 
                 text-align: center;
                 margin-bottom: 2rem;
                 border: 1px solid rgba(0,255,136,0.3);
-            }}
-            .games-grid {{ 
+            }}}}
+            .games-grid {{{{ 
                 display: grid; 
                 grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
                 gap: 1.5rem; 
-            }}
-            .game-card {{ 
+            }}}}
+            .game-card {{{{ 
                 background: rgba(255,255,255,0.1); 
                 padding: 1.5rem; 
                 border-radius: 10px;
                 border: 1px solid rgba(0,255,136,0.3);
-            }}
-            .game-card.completed {{ 
+            }}}}
+            .game-card.completed {{{{ 
                 border-color: #00ff88;
                 background: rgba(0,255,136,0.2);
-            }}
-            .game-title {{ color: #00ff88; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; }}
-            .game-stats {{ display: flex; justify-content: space-between; margin-bottom: 1rem; }}
-            .nav-links {{ text-align: center; margin-bottom: 2rem; }}
-            .nav-links a {{ 
+            }}}}
+            .game-title {{{{ color: #00ff88; font-size: 1.2rem; font-weight: bold; margin-bottom: 1rem; }}}}
+            .game-stats {{{{ display: flex; justify-content: space-between; margin-bottom: 1rem; }}}}
+            .nav-links {{{{ text-align: center; margin-bottom: 2rem; }}}}
+            .nav-links a {{{{ 
                 color: #00ff88; 
                 text-decoration: none; 
                 margin: 0 1rem; 
                 padding: 0.5rem 1rem; 
                 background: rgba(0,255,136,0.2); 
                 border-radius: 5px;
-            }}
-            .progress-circle {{ 
+            }}}}
+            .progress-circle {{{{ 
                 width: 100px; 
                 height: 100px; 
                 border-radius: 50%; 
-                background: conic-gradient(#00ff88 0deg, #00ff88 {progress_degrees}deg, rgba(255,255,255,0.2) {progress_degrees}deg);
+                background: {progress_css};
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
                 margin: 0 auto 1rem;
                 position: relative;
-            }}
-            .progress-circle::before {{ 
+            }}}}
+            .progress-circle::before {{{{ 
                 content: ''; 
                 width: 80px; 
                 height: 80px; 
                 border-radius: 50%; 
                 background: #1a1a3a; 
                 position: absolute;
-            }}
-            .progress-text {{ 
+            }}}}
+            .progress-text {{{{ 
                 position: relative; 
                 z-index: 1; 
                 font-weight: bold; 
                 color: #00ff88;
-            }}
+            }}}}
         </style>
     </head>
     <body>
