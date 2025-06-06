@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vigenère Cipher Challenge</title>
+    <title>Hash Detective Challenge</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -76,6 +76,12 @@
             font-size: 1.3rem;
             font-weight: bold;
             color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .accuracy-text {
+            font-size: 1rem;
+            color: #ffa500;
         }
 
         .progress-bar {
@@ -90,7 +96,7 @@
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, #00ff88, #00cc6a);
-            width: {{ (score / 10 * 100) if score else 0 }}%;
+            width: {{ (score / 15 * 100) if score else 0 }}%;
             transition: width 0.5s ease;
         }
 
@@ -103,69 +109,70 @@
             margin-bottom: 2rem;
         }
 
-        .cipher-display {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(0, 255, 136, 0.5);
+        .hash-display {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 255, 136, 0.5);
             border-radius: 10px;
-            padding: 1.5rem;
+            padding: 2rem;
             margin-bottom: 2rem;
             text-align: center;
         }
 
-        .encrypted-text {
-            font-family: 'Courier New', monospace;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #00ff88;
-            letter-spacing: 0.2rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-        }
-
-        .key-display {
+        .hash-label {
             font-size: 1.2rem;
-            color: #ffa500;
-            margin-bottom: 0.5rem;
-        }
-
-        .key-value {
-            font-family: 'Courier New', monospace;
+            color: #00ff88;
+            margin-bottom: 1rem;
             font-weight: bold;
-            color: #ffcc00;
         }
 
-        .input-section {
+        .hash-value {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        .selection-section {
             margin-bottom: 2rem;
         }
 
-        .input-label {
+        .selection-label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
             font-weight: bold;
             color: #00ff88;
+            font-size: 1.1rem;
         }
 
-        .guess-input {
+        .algorithm-select {
             width: 100%;
             padding: 1rem;
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(0, 255, 136, 0.3);
             border-radius: 8px;
             color: #ffffff;
-            font-size: 1.2rem;
-            font-family: 'Courier New', monospace;
-            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .guess-input:focus {
+        .algorithm-select:focus {
             outline: none;
             border-color: #00ff88;
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
-        .guess-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+        .algorithm-select option {
+            background: #1a1a3a;
+            color: #ffffff;
+            padding: 0.5rem;
         }
 
         .submit-button {
@@ -189,6 +196,14 @@
             box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
         }
 
+        .submit-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         .result-section {
             margin-top: 2rem;
             padding: 1rem;
@@ -210,7 +225,7 @@
             color: #ff4545;
         }
 
-        .cipher-info {
+        .hash-info {
             background: rgba(0, 255, 136, 0.1);
             border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 10px;
@@ -218,15 +233,45 @@
             margin-bottom: 2rem;
         }
 
-        .cipher-info h3 {
+        .hash-info h3 {
             color: #00ff88;
             margin-bottom: 1rem;
         }
 
-        .cipher-info p {
+        .hash-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .hash-type {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .hash-type-name {
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .hash-type-length {
             font-size: 0.9rem;
-            line-height: 1.5;
-            opacity: 0.9;
+            color: #ffa500;
+        }
+
+        .completion-status {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #ffd700;
+            font-weight: bold;
         }
 
         .action-buttons {
@@ -253,25 +298,14 @@
             transform: translateY(-2px);
         }
 
-        .completion-status {
-            background: rgba(255, 215, 0, 0.2);
-            border: 1px solid rgba(255, 215, 0, 0.5);
-            border-radius: 10px;
-            padding: 1rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            color: #ffd700;
-            font-weight: bold;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
         }
 
-        @keyframes glow {
-            0% { text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
-            50% { text-shadow: 0 0 30px rgba(0, 255, 136, 0.8); }
-            100% { text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
-        }
-
-        .encrypted-text {
-            animation: glow 3s ease-in-out infinite;
+        .hash-display {
+            animation: pulse 2s infinite;
         }
 
         @media (max-width: 768px) {
@@ -279,9 +313,12 @@
                 padding: 1rem;
             }
             
-            .encrypted-text {
-                font-size: 1.4rem;
-                letter-spacing: 0.1rem;
+            .hash-value {
+                font-size: 1rem;
+            }
+            
+            .hash-types {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -292,68 +329,80 @@
             <a href="/"><i class="fas fa-home"></i> Home</a>
             <a href="/map"><i class="fas fa-map"></i> Challenge Map</a>
             <a href="/leaderboard/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
-            <a href="/vigenere/reset"><i class="fas fa-redo"></i> Reset</a>
+            <a href="/hashgame/reset"><i class="fas fa-redo"></i> Reset</a>
         </div>
 
         <div class="game-header">
             <h1 class="game-title">
-                <i class="fas fa-code"></i> Vigenère Cipher Challenge
+                <i class="fas fa-search"></i> Hash Detective Challenge
             </h1>
             <p class="game-description">
-                Decrypt the encrypted words using the provided key. Master the art of classical cryptography!
+                Analyze the hash patterns and identify the algorithm used. Become a master hash detective!
             </p>
         </div>
 
         <div class="score-display">
             <div class="score-text">
-                <i class="fas fa-star"></i> Score: {{ score }}/{{ total }}
+                <i class="fas fa-crosshairs"></i> Score: {{ score }}/{{ total }}
             </div>
+            {% if total > 0 %}
+            <div class="accuracy-text">
+                Accuracy: {{ "%.1f"|format((score / total * 100) if total > 0 else 0) }}%
+            </div>
+            {% endif %}
             <div class="progress-bar">
                 <div class="progress-fill"></div>
             </div>
-            {% if score >= 5 %}
+            {% if completed %}
             <div class="completion-status">
-                <i class="fas fa-trophy"></i> Congratulations! Challenge Completed!
+                <i class="fas fa-trophy"></i> Challenge Mastered! You're a Hash Detective!
             </div>
             {% endif %}
         </div>
 
-        <div class="cipher-info">
-            <h3><i class="fas fa-info-circle"></i> About Vigenère Cipher</h3>
-            <p>
-                The Vigenère cipher is a polyalphabetic substitution cipher that uses a repeating keyword to encrypt text. 
-                Each letter of the keyword determines how much to shift the corresponding letter in the plaintext.
-            </p>
+        <div class="hash-info">
+            <h3><i class="fas fa-info-circle"></i> Hash Algorithm Characteristics</h3>
+            <div class="hash-types">
+                <div class="hash-type">
+                    <div class="hash-type-name">MD5</div>
+                    <div class="hash-type-length">32 characters</div>
+                </div>
+                <div class="hash-type">
+                    <div class="hash-type-name">SHA1</div>
+                    <div class="hash-type-length">40 characters</div>
+                </div>
+                <div class="hash-type">
+                    <div class="hash-type-name">SHA256</div>
+                    <div class="hash-type-length">64 characters</div>
+                </div>
+            </div>
         </div>
 
         <div class="challenge-card">
-            <div class="cipher-display">
-                <div class="encrypted-text">{{ encrypted }}</div>
-                <div class="key-display">
-                    Key: <span class="key-value">{{ key }}</span>
+            <div class="hash-display">
+                <div class="hash-label">
+                    <i class="fas fa-hashtag"></i> Identify this hash:
                 </div>
+                <div class="hash-value">{{ hashed_word }}</div>
             </div>
 
             <form method="POST">
-                <input type="hidden" name="original" value="{{ original }}">
-                <input type="hidden" name="key" value="{{ key }}">
-                <input type="hidden" name="encrypted" value="{{ encrypted }}">
+                <input type="hidden" name="correct_algo" value="{{ correct_algo }}">
                 
-                <div class="input-section">
-                    <label class="input-label" for="guess">
-                        <i class="fas fa-key"></i> Enter the decrypted word:
+                <div class="selection-section">
+                    <label class="selection-label" for="algo_choice">
+                        <i class="fas fa-microscope"></i> Which algorithm was used?
                     </label>
-                    <input type="text" 
-                           id="guess" 
-                           name="guess" 
-                           class="guess-input"
-                           placeholder="Type your decryption here..." 
-                           required 
-                           autocomplete="off">
+                    <select id="algo_choice" name="algo_choice" class="algorithm-select" required>
+                        <option value="">🔍 Select the hash algorithm...</option>
+                        <option value="md5">🔐 MD5 (32 characters)</option>
+                        <option value="sha1">🔒 SHA1 (40 characters)</option>
+                        <option value="sha256">🛡️ SHA256 (64 characters)</option>
+                    </select>
                 </div>
 
-                <button type="submit" class="submit-button">
-                    <i class="fas fa-unlock"></i> Decrypt & Submit
+                <button type="submit" class="submit-button" id="submit-btn" disabled>
+                    <i class="fas fa-search"></i> Submit Detection
                 </button>
             </form>
 
@@ -365,7 +414,7 @@
         </div>
 
         <div class="action-buttons">
-            <a href="/map/minigame/hashgame" class="action-button">
+            <a href="/map/minigame/sqlinjector" class="action-button">
                 <i class="fas fa-arrow-right"></i> Next Challenge
             </a>
             <a href="/leaderboard" class="action-button">
@@ -378,12 +427,27 @@
     </div>
 
     <script>
-        // Auto-focus the input field
-        document.getElementById('guess').focus();
+        // Enable submit button when selection is made
+        document.getElementById('algo_choice').addEventListener('change', function() {
+            document.getElementById('submit-btn').disabled = this.value === '';
+        });
 
-        // Add keyboard shortcut for submission
+        // Auto-focus the select element
+        document.getElementById('algo_choice').focus();
+
+        // Add keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
+            const select = document.getElementById('algo_choice');
+            if (e.key === '1') {
+                select.value = 'md5';
+                select.dispatchEvent(new Event('change'));
+            } else if (e.key === '2') {
+                select.value = 'sha1';
+                select.dispatchEvent(new Event('change'));
+            } else if (e.key === '3') {
+                select.value = 'sha256';
+                select.dispatchEvent(new Event('change'));
+            } else if (e.key === 'Enter' && select.value !== '') {
                 document.querySelector('form').submit();
             }
         });
@@ -399,22 +463,27 @@
             }, 500);
         });
 
-        // Add visual feedback for input
-        const guessInput = document.getElementById('guess');
-        guessInput.addEventListener('input', function() {
-            if (this.value.length > 0) {
-                this.style.borderColor = '#00ff88';
-                this.style.boxShadow = '0 0 10px rgba(0, 255, 136, 0.3)';
-            } else {
-                this.style.borderColor = 'rgba(0, 255, 136, 0.3)';
-                this.style.boxShadow = 'none';
-            }
-        });
+        // Add visual feedback for hash length analysis
+        const hashValue = document.querySelector('.hash-value');
+        const hashLength = hashValue.textContent.length;
+        
+        // Highlight based on length
+        if (hashLength === 32) {
+            hashValue.style.borderLeftColor = '#ff6b35'; // MD5 hint
+        } else if (hashLength === 40) {
+            hashValue.style.borderLeftColor = '#ffa500'; // SHA1 hint
+        } else if (hashLength === 64) {
+            hashValue.style.borderLeftColor = '#00ff88'; // SHA256 hint
+        }
+
+        // Add character counter
+        const hashLabel = document.querySelector('.hash-label');
+        hashLabel.innerHTML += ` <small style="color: #ffa500;">(${hashLength} characters)</small>`;
 
         // Celebration animation for completion
-        {% if score >= 5 %}
+        {% if completed %}
         setTimeout(() => {
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 15; i++) {
                 createConfetti();
             }
         }, 1000);
@@ -427,7 +496,7 @@
             confetti.style.fontSize = '20px';
             confetti.style.pointerEvents = 'none';
             confetti.style.zIndex = '1000';
-            confetti.textContent = ['🎉', '🎊', '🔓', '⭐', '💫'][Math.floor(Math.random() * 5)];
+            confetti.textContent = ['🎉', '🎊', '🔍', '🕵️', '💫', '🏆'][Math.floor(Math.random() * 6)];
             
             document.body.appendChild(confetti);
             
@@ -445,3 +514,4 @@
     </script>
 </body>
 </html>
+            

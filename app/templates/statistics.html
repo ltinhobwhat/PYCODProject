@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSec Academy - Statistics</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 0;
+            border-bottom: 2px solid #00ff88;
+            margin-bottom: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(0, 255, 136, 0.2);
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #00ff88;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #00ff88;
+        }
+
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: #00ff88;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .games-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .game-stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .game-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .game-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.3rem;
+        }
+
+        .completion-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .completion-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4757, #ffa502, #00ff88);
+            border-radius: 10px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000000;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .top-players {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            height: 200px;
+        }
+
+        .podium-place {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px 10px 0 0;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            min-width: 150px;
+            transition: transform 0.3s ease;
+        }
+
+        .podium-place:hover {
+            transform: scale(1.05);
+        }
+
+        .podium-first {
+            height: 150px;
+            background: linear-gradient(135deg, #ffd700, #ffed4a);
+            color: #000000;
+            order: 2;
+        }
+
+        .podium-second {
+            height: 120px;
+            background: linear-gradient(135deg, #c0c0c0, #e2e8f0);
+            color: #000000;
+            order: 1;
+        }
+
+        .podium-third {
+            height: 100px;
+            background: linear-gradient(135deg, #cd7f32, #d69e2e);
+            color: #000000;
+            order: 3;
+        }
+
+        .podium-rank {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .podium-username {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .podium-score {
+            font-size: 0.9rem;
+        }
+
+        .chart-container {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .difficulty-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .difficulty-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .difficulty-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .difficulty-rate {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .rate-excellent { color: #00ff88; }
+        .rate-good { color: #ffa502; }
+        .rate-fair { color: #ff6b6b; }
+
+        @media (max-width: 768px) {
+            .podium {
+                flex-direction: column;
+                height: auto;
+                align-items: center;
+            }
+            
+            .podium-place {
+                width: 100%;
+                height: auto !important;
+                order: initial !important;
+            }
+            
+            .games-stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i> CyberSec Academy
+                </div>
+                <div class="nav-links">
+                    <a href="/"><i class="fas fa-home"></i> Home</a>
+                    <a href="/leaderboard"><i class="fas fa-trophy"></i> Leaderboard</a>
+                    <a href="/leaderboard/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+                    <a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">
+            <i class="fas fa-chart-bar"></i> Global Statistics
+        </h1>
+
+        <!-- Overview Statistics -->
+        <div class="stats-section">
+            <h2 class="section-title">Platform Overview</h2>
+            <div class="overview-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-number">{{ stats.total_users }}</div>
+                    <div class="stat-label">Total Players</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Security Challenges</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                    <div class="stat-number">{{ (stats.games.values() | sum(attribute='attempted')) }}</div>
+                    <div class="stat-label">Total Attempts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="stat-number">{{ (stats.games.values() | sum(attribute='completed')) }}</div>
+                    <div class="stat-label">Total Completions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Players Podium -->
+        <div class="top-players">
+            <h2 class="section-title">Top Performers</h2>
+            <div class="podium">
+                {% if top_players|length >= 2 %}
+                <div class="podium-place podium-second">
+                    <div class="podium-rank">🥈</div>
+                    <div class="podium-username">{{ top_players[1].username }}</div>
+                    <div class="podium-score">{{ top_players[1].total_score }} pts</div>
+                </div>
+                {% endif %}
+                
+                {% if top_players|length >= 1 %}
+                <div class="podium-place podium-first">
+                    <div class="podium-rank">🥇</div>
+                    <div class="podium-username">{{ top_players[0].username }}</div>
+                    <div class="podium-score">{{ top_players[0].total_score }} pts</div>
+                </div>
+                {% endif %}
+                
+                {% if top_players|length >= 3 %}
+                <div class="podium-place podium-third">
+                    <div class="podium-rank">🥉</div>
+                    <div class="podium-username">{{ top_players[2].username }}</div>
+                    <div class="podium-score">{{ top_players[2].total_score }} pts</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Game-Specific Statistics -->
+        <div class="stats-section">
+            <h2 class="section-title">Challenge Statistics</h2>
+            <div class="games-stats-grid">
+                {% for game_name, game_data in stats.games.items() %}
+                <div class="game-stat-card">
+                    <div class="game-name">{{ game_data.name }}</div>
+                    <div class="game-metrics">
+                        <div class="metric">
+                            <div class="metric-value">{{ game_data.attempted }}</div>
+                            <div class="metric-label">Attempts</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">{{ game_data.completed }}</div>
+                            <div class="metric-label">Completed</div>
+                        </div>
+                    </div>
+                    <div class="completion-bar">
+                        <div class="completion-fill" style="width: {{ game_data.completion_rate }}%">
+                            {{ "%.1f"|format(game_data.completion_rate) }}%
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Difficulty Analysis -->
+        <div class="stats-section">
+            <h2 class="section-title">Difficulty Analysis</h2>
+            <div class="chart-container">
+                <p style="margin-bottom: 1rem; opacity: 0.8;">Based on completion rates, here's how challenging each game is:</p>
+                <div class="difficulty-chart">
+                    {% for game_name, game_data in stats.games.items() %}
+                    <div class="difficulty-bar">
+                        <div class="difficulty-name">{{ game_data.name }}</div>
+                        <div class="difficulty-rate {{ 'rate-excellent' if game_data.completion_rate >= 70 else ('rate-good' if game_data.completion_rate >= 40 else 'rate-fair') }}">
+                            {{ "%.1f"|format(game_data.completion_rate) }}%
+                        </div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">
+                            {% if game_data.completion_rate >= 70 %}
+                                😊 Beginner Friendly
+                            {% elif game_data.completion_rate >= 40 %}
+                                🤔 Moderate Challenge
+                            {% else %}
+                                😤 Expert Level
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate completion bars
+        window.addEventListener('load', () => {
+            const completionBars = document.querySelectorAll('.completion-fill');
+            completionBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+        });
+
+        // Update statistics every minute
+        setInterval(() => {
+            location.reload();
+        }, 60000);
+    </script>
+</body>
+</html>

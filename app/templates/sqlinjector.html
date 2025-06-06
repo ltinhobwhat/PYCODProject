@@ -1,31 +1,553 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Challenge</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}SQL Injection Trainer{% endblock %}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
 
-{% block content %}
-<div class="container">
-    <h1>SQL Injection Trainer</h1>
-    <p><strong>Level {{ level }}:</strong> {{ hint }}</p>
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-    <form method="post">
-        <input type="text" name="username" placeholder="Username" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Login</button>
-    </form>
+        .nav-links {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-    {% if query %}
-        <p><strong>Simulated Query:</strong></p>
-        <pre>{{ query }}</pre>
-        {% if result %}
-            <p class="{{ 'success' if success else 'fail' }}">{{ result }}</p>
+        .nav-links a {
+            color: #00ff88;
+            text-decoration: none;
+            margin: 0 1rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            color: #ff4757;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+        }
+
+        .game-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .level-display {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .level-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff4757;
+            margin-bottom: 0.5rem;
+        }
+
+        .hint-text {
+            font-size: 1rem;
+            color: #ffa500;
+            font-style: italic;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .progress-step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.completed {
+            background: #00ff88;
+            border-color: #00ff88;
+            color: #000000;
+        }
+
+        .progress-step.current {
+            background: #ff4757;
+            border-color: #ff4757;
+            color: #ffffff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        .challenge-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .login-simulator {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 71, 87, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .simulator-title {
+            color: #ff4757;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #ff4757;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 71, 87, 0.3);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff4757;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .exploit-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .exploit-button:hover {
+            background: linear-gradient(135deg, #ff3742, #ff2f3a);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        .query-display {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 71, 87, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .query-label {
+            color: #ff4757;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .query-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #ff4757;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .result-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .result-success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+
+        .result-fail {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid #ffa500;
+            color: #ffa500;
+        }
+
+        .result-complete {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid #ffd700;
+            color: #ffd700;
+        }
+
+        .injection-tips {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .injection-tips h3 {
+            color: #ffa500;
+            margin-bottom: 1rem;
+        }
+
+        .tip-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tip-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .tip-list li::before {
+            content: '⚠️';
+            position: absolute;
+            left: 0;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-button {
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .reset-button {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: rgba(255, 165, 0, 0.5);
+            color: #ffa500;
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+
+        .warning-banner {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .warning-banner h4 {
+            color: #ff4757;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-banner p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .progress-indicator {
+                gap: 0.5rem;
+            }
+            
+            .progress-step {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/"><i class="fas fa-home"></i> Home</a>
+            <a href="/map"><i class="fas fa-map"></i> Challenge Map</a>
+            <a href="/leaderboard/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="/sqlinjector/reset"><i class="fas fa-redo"></i> Reset</a>
+        </div>
+
+        <div class="game-header">
+            <h1 class="game-title">
+                <i class="fas fa-bug"></i> SQL Injection Challenge
+            </h1>
+            <p class="game-description">
+                Learn offensive security techniques by exploiting SQL injection vulnerabilities in this simulated environment.
+            </p>
+        </div>
+
+        <div class="warning-banner">
+            <h4><i class="fas fa-exclamation-triangle"></i> Educational Purpose Only</h4>
+            <p>This is a controlled learning environment. Never attempt SQL injection on real systems without proper authorization.</p>
+        </div>
+
+        <div class="level-display">
+            <div class="level-text">
+                <i class="fas fa-layer-group"></i> Level {{ level }}/{{ total_levels }}
+            </div>
+            <div class="hint-text">{{ hint }}</div>
+        </div>
+
+        <div class="progress-indicator">
+            {% for i in range(1, total_levels + 1) %}
+            <div class="progress-step {{ 'completed' if i < level else ('current' if i == level else '') }}">
+                {{ i }}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="injection-tips">
+            <h3><i class="fas fa-lightbulb"></i> SQL Injection Techniques</h3>
+            <ul class="tip-list">
+                <li>Try using <code>' OR '1'='1</code> to bypass authentication</li>
+                <li>Use <code>--</code> to comment out the rest of the SQL query</li>
+                <li>Experiment with different positions for your injection</li>
+                <li>Remember that SQL is case-insensitive for keywords</li>
+            </ul>
+        </div>
+
+        <div class="challenge-card">
+            <div class="login-simulator">
+                <div class="simulator-title">
+                    <i class="fas fa-terminal"></i> Vulnerable Login System
+                </div>
+                
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i> Username:
+                        </label>
+                        <input type="text" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Enter username or injection payload..."
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Password:
+                        </label>
+                        <input type="password" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Enter password or injection payload..."
+                               required>
+                    </div>
+
+                    <button type="submit" class="exploit-button">
+                        <i class="fas fa-rocket"></i> Attempt Login
+                    </button>
+                </form>
+            </div>
+
+            {% if query %}
+            <div class="query-display">
+                <div class="query-label">
+                    <i class="fas fa-database"></i> Generated SQL Query:
+                </div>
+                <div class="query-code">{{ query }}</div>
+                
+                {% if result %}
+                <div class="result-section {{ 'result-success' if success else ('result-complete' if '🎉' in result else 'result-fail') }}">
+                    {{ result|safe }}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="action-buttons">
+            <a href="/map/minigame/sqldefender" class="action-button">
+                <i class="fas fa-shield-alt"></i> SQL Defense
+            </a>
+            <a href="/sqlinjector/reset" class="action-button reset-button">
+                <i class="fas fa-redo"></i> Reset Progress
+            </a>
+            <a href="/leaderboard" class="action-button">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="/" class="action-button">
+                <i class="fas fa-home"></i> Main Menu
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus the username field
+        document.getElementById('username').focus();
+
+        // Add keyboard shortcuts for common payloads
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === '1') {
+                e.preventDefault();
+                document.getElementById('username').value = "' OR '1'='1";
+            } else if (e.ctrlKey && e.key === '2') {
+                e.preventDefault();
+                document.getElementById('username').value = "admin'--";
+            } else if (e.ctrlKey && e.key === '3') {
+                e.preventDefault();
+                document.getElementById('password').value = "' OR '1'='1";
+            }
+        });
+
+        // Add visual feedback for input
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value.includes("'") || this.value.includes("--") || this.value.includes("OR")) {
+                    this.style.borderColor = '#ff4757';
+                    this.style.boxShadow = '0 0 10px rgba(255, 71, 87, 0.3)';
+                } else {
+                    this.style.borderColor = 'rgba(255, 71, 87, 0.3)';
+                    this.style.boxShadow = 'none';
+                }
+            });
+        });
+
+        // Celebration animation for completion
+        {% if result and '🎉' in result %}
+        setTimeout(() => {
+            for (let i = 0; i < 20; i++) {
+                createConfetti();
+            }
+        }, 1000);
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.top = '-10px';
+            confetti.style.fontSize = '20px';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.zIndex = '1000';
+            confetti.textContent = ['🎉', '🎊', '💀', '🔓', '💻', '⚡'][Math.floor(Math.random() * 6)];
+            
+            document.body.appendChild(confetti);
+            
+            const animation = confetti.animate([
+                { transform: 'translateY(-10px) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 10}px) rotate(360deg)`, opacity: 0 }
+            ], {
+                duration: 3000,
+                easing: 'linear'
+            });
+            
+            animation.onfinish = () => confetti.remove();
+        }
         {% endif %}
-    {% endif %}
 
-    <p style="margin-top: 1rem;">
-        <a href="{{ url_for('menu.menu') }}">⬅️ Back to Menu</a>
-    </p>
-    <p style="margin-top: 0.5rem;">
-        <a href="{{ url_for('sqlinjector.reset_levels') }}">🔄 Reset Levels</a>
-    </p>    
-</div>
-{% endblock %}
+        // Add typing effect for hints
+        const hintText = document.querySelector('.hint-text');
+        const originalText = hintText.textContent;
+        let index = 0;
+
+        function typeHint() {
+            if (index < originalText.length) {
+                hintText.textContent = originalText.slice(0, index + 1);
+                index++;
+                setTimeout(typeHint, 50);
+            }
+        }
+
+        hintText.textContent = '';
+        setTimeout(typeHint, 1000);
+    </script>
+</body>
+</html>

@@ -2,76 +2,368 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Cyber Game Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSec Academy - Main Menu</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Base styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            background-color: #0a0a12;
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(46, 12, 80, 0.3) 0%, transparent 60%),
-                linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #f8f8f2;
-            font-family: 'Rajdhani', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            border-bottom: 2px solid #00ff88;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-stats {
+            text-align: right;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .user-rank {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #00ff88;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+            to { text-shadow: 0 0 30px rgba(0, 255, 136, 0.8); }
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .progress-overview {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 600px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .progress-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #00ff88;
+            text-align: center;
+        }
+
+        .overall-progress {
+            display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: conic-gradient(#00ff88 0deg, #00ff88 var(--progress, 0deg), rgba(255, 255, 255, 0.2) var(--progress, 0deg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
-            cursor: url('https://cur.cursors-4u.net/cursors/cur-13/cur1163.cur'), auto;
         }
-        
-        /* Grid overlay effect */
-        body::before {
-            content: "";
+
+        .progress-circle::before {
+            content: '';
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1a1a3a;
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: linear-gradient(rgba(15, 15, 30, 0.1) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(15, 15, 30, 0.1) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
-            animation: gridMove 60s linear infinite;
         }
-        
-        @keyframes gridMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 40px 40px; }
+
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+            color: #00ff88;
         }
-        
-        /* Floating particles */
-        .particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
+
+        .progress-stats {
+            text-align: center;
+        }
+
+        .stat-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .action-icon {
+            font-size: 2rem;
+            color: #00ff88;
+            margin-bottom: 1rem;
+        }
+
+        .action-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .games-section {
+            margin: 3rem 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #00ff88;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
             overflow: hidden;
         }
-        
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: #00ff88;
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.2);
+        }
+
+        .game-card.completed {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .game-card.completed::before {
+            content: '✅';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .game-icon {
+            font-size: 2rem;
+            color: #00ff88;
+            margin-right: 1rem;
+        }
+
+        .game-info {
+            flex: 1;
+        }
+
+        .game-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .game-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .game-progress {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            transition: width 0.5s ease;
+        }
+
+        .progress-label {
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0.9;
+        }
+
+        .play-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .play-button:hover {
+            background: linear-gradient(135deg, #00cc6a, #009955);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
         .particle {
             position: absolute;
             width: 2px;
             height: 2px;
-            background-color: rgba(0, 255, 225, 0.5);
-            border-radius: 50%;
-            animation: float 8s infinite linear;
+            background: #00ff88;
+            animation: float 6s infinite linear;
         }
-        
+
         @keyframes float {
             0% {
-                transform: translateY(100vh) translateX(0);
+                transform: translateY(100vh) rotate(0deg);
                 opacity: 0;
             }
             10% {
@@ -81,586 +373,241 @@
                 opacity: 1;
             }
             100% {
-                transform: translateY(-100px) translateX(100px);
+                transform: translateY(-10vh) rotate(360deg);
                 opacity: 0;
             }
         }
-        
-        /* Container */
-        .container {
-            background: rgba(15, 12, 41, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 255, 225, 0.3);
-            border-radius: 15px;
-            padding: 3rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 90%;
-            width: 500px;
-            box-shadow: 0 0 40px rgba(0, 255, 225, 0.2);
-            position: relative;
-            overflow: hidden;
-            z-index: 10;
-        }
-        
-        /* Scan effect */
-        .container::after {
-            content: "";
-            position: absolute;
-            top: -150%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                rgba(0, 255, 225, 0),
-                rgba(0, 255, 225, 0.08),
-                rgba(0, 255, 225, 0)
-            );
-            transform: rotate(45deg);
-            animation: scan 6s linear infinite;
-            z-index: -1;
-        }
-        
-        @keyframes scan {
-            0% { top: -150%; }
-            100% { top: 150%; }
-        }
-        
-        /* Glitchy Title */
-        @keyframes glitch {
-            0% { 
-                text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7;
-                transform: translate(0);
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
             }
-            25% { 
-                text-shadow: -2px 2px #00fff7, 2px -2px #ff00c8;
-                transform: translate(-2px, 1px);
+            
+            .overall-progress {
+                flex-direction: column;
+                gap: 1rem;
             }
-            50% { 
-                text-shadow: 2px -2px #ff00c8, -2px 2px #00fff7;
-                transform: translate(0);
+            
+            .games-grid {
+                grid-template-columns: 1fr;
             }
-            75% { 
-                text-shadow: -1px -1px #ff00c8, 1px 1px #00fff7;
-                transform: translate(2px, -1px);
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
             }
-            100% { 
-                text-shadow: 2px 2px #ff00c8, -2px -2px #00fff7; 
-                transform: translate(0);
-            }
-        }
-        
-        .title-wrapper {
-            position: relative;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        
-        h1 {
-            color: #fff;
-            font-size: 3.5rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-            position: relative;
-            animation: glitch 3s infinite;
-            text-transform: uppercase;
-        }
-        
-        .subtitle {
-            color: #00ffe1;
-            font-size: 1rem;
-            letter-spacing: 4px;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            position: relative;
-        }
-        
-        /* Decorative elements */
-        .corner {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #00ffe1;
-            opacity: 0.8;
-        }
-        
-        .corner-tl {
-            top: 0;
-            left: 0;
-            border-right: none;
-            border-bottom: none;
-        }
-        
-        .corner-tr {
-            top: 0;
-            right: 0;
-            border-left: none;
-            border-bottom: none;
-        }
-        
-        .corner-bl {
-            bottom: 0;
-            left: 0;
-            border-right: none;
-            border-top: none;
-        }
-        
-        .corner-br {
-            bottom: 0;
-            right: 0;
-            border-left: none;
-            border-top: none;
-        }
-        
-        /* Button container */
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-        
-        form {
-            width: 100%;
-        }
-        
-        button {
-            background: rgba(15, 12, 41, 0.7);
-            color: #00ffe1;
-            border: 2px solid #00ffe1;
-            padding: 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 255, 225, 0.5);
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        button::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(0, 255, 225, 0.2),
-                transparent
-            );
-            transition: 0.5s;
-        }
-        
-        button:hover::before {
-            left: 100%;
-        }
-        
-        button:hover {
-            background: rgba(0, 255, 225, 0.2);
-            box-shadow: 0 0 20px rgba(0, 255, 225, 0.8);
-            transform: translateY(-3px);
-        }
-        
-        button:active {
-            transform: translateY(1px);
-        }
-        
-        /* Icons */
-        .icon {
-            display: inline-block;
-            font-size: 1.2rem;
-            margin-right: 5px;
-        }
-        
-        /* Pulse effect */
-        @keyframes pulse {
-            0% { box-shadow: 0 0 10px rgba(0, 255, 225, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(0, 255, 225, 0.8); }
-            100% { box-shadow: 0 0 10px rgba(0, 255, 225, 0.5); }
-        }
-        
-        /* Status indicator */
-        .status {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            font-size: 0.8rem;
-            color: #00ffe1;
-            display: flex;
-            align-items: center;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #00ffe1;
-            border-radius: 50%;
-            margin-right: 5px;
-            animation: pulse 2s infinite;
-        }
-        
-        /* Audio controls */
-        .audio-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(15, 12, 41, 0.7);
-            border: 1px solid rgba(0, 255, 225, 0.3);
-            padding: 5px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Cyber modal styles */
-        .cyber-modal {
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: rgba(15, 12, 41, 0.9);
-            border: 1px solid #00ffe1;
-            border-radius: 10px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 0 30px rgba(0, 255, 225, 0.5);
-        }
-
-        .cyber-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 1rem;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ffe1;
-            color: white;
-            border-radius: 4px;
-        }
-
-        .close {
-            color: #00ffe1;
-            float: right;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .save-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid rgba(0, 255, 225, 0.3);
-            margin-bottom: 10px;
-        }
-
-        /* Login/Signup forms */
-        .cyber-container {
-            background: rgba(15, 12, 41, 0.7);
-            padding: 2rem;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .cyber-input {
-            margin-bottom: 1rem;
-        }
-
-        .cyber-input label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #00ffe1;
-        }
-
-        .cyber-input input {
-            width: 100%;
-            padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ffe1;
-            color: white;
-        }/* Cyber modal styles */
-        .cyber-modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-
-        .modal-content {
-            background-color: #0a0a12;
-            border: 1px solid #00ffe1;
-            margin: 10% auto;
-            padding: 20px;
-            width: 80%;
-            max-width: 500px;
-            box-shadow: 0 0 20px rgba(0, 255, 225, 0.5);
-        }
-
-        .close {
-            color: #00ffe1;
-            float: right;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .save-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid rgba(0, 255, 225, 0.3);
-            margin-bottom: 10px;
-        }
-
-        /* Login/Signup forms */
-        .cyber-container {
-            background: rgba(15, 12, 41, 0.7);
-            padding: 2rem;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .cyber-input {
-            margin-bottom: 1rem;
-        }
-
-        .cyber-input label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #00ffe1;
-        }
-
-        .cyber-input input {
-            width: 100%;
-            padding: 0.5rem;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ffe1;
-            color: white;
-        }
-
-        .cyber-modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: rgba(15, 12, 41, 0.9);
-            border: 2px solid #00ffe1;
-            border-radius: 10px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            margin: 10% auto;
-            box-shadow: 0 0 30px rgba(0, 255, 225, 0.5);
         }
     </style>
 </head>
 <body>
-    <!-- Floating particles -->
-    <div class="particles">
-        <div class="particle" style="left:10%; animation-duration: 10s; animation-delay: 0s;"></div>
-        <div class="particle" style="left:20%; animation-duration: 12s; animation-delay: 1s;"></div>
-        <div class="particle" style="left:35%; animation-duration: 7s; animation-delay: 2s;"></div>
-        <div class="particle" style="left:55%; animation-duration: 14s; animation-delay: 0.5s;"></div>
-        <div class="particle" style="left:65%; animation-duration: 9s; animation-delay: 1.5s;"></div>
-        <div class="particle" style="left:75%; animation-duration: 8s; animation-delay: 3s;"></div>
-        <div class="particle" style="left:85%; animation-duration: 11s; animation-delay: 2.5s;"></div>
-        <div class="particle" style="left:90%; animation-duration: 10s; animation-delay: 1s;"></div>
-        <div class="particle" style="left:15%; animation-duration: 13s; animation-delay: 2s;"></div>
-        <div class="particle" style="left:45%; animation-duration: 8s; animation-delay: 1.5s;"></div>
+    <!-- Floating Particles Background -->
+    <div class="floating-particles">
+        <!-- Particles will be generated by JavaScript -->
+    </div>
+
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i> CyberSec Academy
+                </div>
+                <div class="user-info">
+                    {% if progress %}
+                    <div class="user-stats">
+                        <div class="username">{{ user.username }}</div>
+                        <div class="user-rank">Rank #{{ progress.user.rank }} | {{ progress.stats.total_score }} pts</div>
+                    </div>
+                    {% endif %}
+                    <div class="nav-links">
+                        <a href="/leaderboard/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+                        <a href="/leaderboard"><i class="fas fa-trophy"></i> Leaderboard</a>
+                        <a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="container">
-        <!-- Decorative corners -->
-        <div class="corner corner-tl"></div>
-        <div class="corner corner-tr"></div>
-        <div class="corner corner-bl"></div>
-        <div class="corner corner-br"></div>
-        
-        <div class="title-wrapper">
-            <h1>Neon City</h1>
-            <div class="subtitle">Introduction to Cybersecurity</div>
-        </div>
-        
-        <div class="user-status">
-            {% if current_user.is_authenticated %}
-                Welcome, {{ current_user.username }}!
-                <a href="{{ url_for('auth.logout') }}">Logout</a>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}">Login</a>
+        <div class="hero-section">
+            <h1 class="hero-title">Welcome to CyberSec Academy</h1>
+            <p class="hero-subtitle">Master cybersecurity through interactive challenges and rise through the ranks!</p>
+            
+            {% if progress %}
+            <div class="progress-overview">
+                <h3 class="progress-title">Your Progress</h3>
+                <div class="overall-progress">
+                    <div class="progress-circle" style="--progress: {{ progress.stats.progress_percentage * 3.6 }}deg;">
+                        <div class="progress-text">{{ "%.0f"|format(progress.stats.progress_percentage) }}%</div>
+                    </div>
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <span class="stat-value">{{ progress.stats.completed_games }}/{{ progress.stats.total_games }}</span>
+                            <span> Challenges Completed</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">{{ progress.achievements|length }}</span>
+                            <span> Achievements Earned</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">#{{ progress.user.rank }}</span>
+                            <span> Global Rank</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
         </div>
-     <div class="button-container">
-        <!-- Map Button -->
-        <form action="{{ url_for('map.map_page') }}" method="get">
-            <button type="submit"><span class="icon">🗺️</span> MAP</button>
-        </form>
-        
-        
-        <!-- End Game Button -->
-        <form action="{{ url_for('menu.end_game') }}" method="get">
-            <button type="submit"><span class="icon">🛑</span> END GAME</button>
-        </form>
-        
-        <!-- Login/Logout Button -->
-        {% if current_user.is_authenticated %}
-            <form action="{{ url_for('auth.logout') }}" method="post">
-                <button type="submit"><span class="icon">🚪</span> LOGOUT</button>
-            </form>
-        {% else %}
-            <form action="{{ url_for('auth.login') }}" method="get">
-                <button type="submit"><span class="icon">👤</span> LOGIN</button>
-            </form>
-        {% endif %}
-    </div>
-</div>
 
-        
-        <!-- Status indicator -->
-        <div class="status">
-            <div class="status-dot"></div>
-            <span>SYSTEM ONLINE</span>
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="/map" class="action-card">
+                <div class="action-icon"><i class="fas fa-map"></i></div>
+                <div class="action-title">Challenge Map</div>
+                <div class="action-description">Navigate through all security challenges</div>
+            </a>
+            <a href="/leaderboard" class="action-card">
+                <div class="action-icon"><i class="fas fa-trophy"></i></div>
+                <div class="action-title">Leaderboard</div>
+                <div class="action-description">See how you rank against other players</div>
+            </a>
+            <a href="/leaderboard/dashboard" class="action-card">
+                <div class="action-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="action-title">Dashboard</div>
+                <div class="action-description">Track your detailed progress</div>
+            </a>
+            <a href="/leaderboard/statistics" class="action-card">
+                <div class="action-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="action-title">Statistics</div>
+                <div class="action-description">Global platform statistics</div>
+            </a>
+        </div>
+
+        <!-- Games Section -->
+        <div class="games-section">
+            <h2 class="section-title">Security Challenges</h2>
+            <div class="games-grid">
+                {% if progress %}
+                    {% for game_name, game_data in progress.games.items() %}
+                    <div class="game-card {{ 'completed' if game_data.is_completed else '' }}">
+                        <div class="game-header">
+                            <div class="game-icon">
+                                {% if game_name == 'pswd' %}
+                                    <i class="fas fa-key"></i>
+                                {% elif game_name == 'quiz' %}
+                                    <i class="fas fa-brain"></i>
+                                {% elif game_name == 'vigenere' %}
+                                    <i class="fas fa-lock"></i>
+                                {% elif game_name == 'hashgame' %}
+                                    <i class="fas fa-hashtag"></i>
+                                {% elif game_name == 'sqlinjector' %}
+                                    <i class="fas fa-database"></i>
+                                {% elif game_name == 'sqldefender' %}
+                                    <i class="fas fa-shield-alt"></i>
+                                {% endif %}
+                            </div>
+                            <div class="game-info">
+                                <div class="game-title">{{ game_data.game_display_name }}</div>
+                                <div class="game-subtitle">
+                                    {% if game_data.is_completed %}
+                                        Completed ✅
+                                    {% elif game_data.total_attempts > 0 %}
+                                        In Progress
+                                    {% else %}
+                                        Not Started
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="game-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ (game_data.best_score / game_data.max_score * 100) if game_data.max_score > 0 else 0 }}%"></div>
+                            </div>
+                            <div class="progress-label">
+                                <span>Score: {{ game_data.best_score }}/{{ game_data.max_score }}</span>
+                                <span>Attempts: {{ game_data.total_attempts }}</span>
+                            </div>
+                        </div>
+                        
+                        <a href="/map/minigame/{{ game_name if game_name != 'pswd' else 'password' }}" class="play-button">
+                            {% if game_data.is_completed %}
+                                <i class="fas fa-redo"></i> Play Again
+                            {% elif game_data.total_attempts > 0 %}
+                                <i class="fas fa-play"></i> Continue
+                            {% else %}
+                                <i class="fas fa-play"></i> Start Challenge
+                            {% endif %}
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Fallback if no progress data -->
+                    <div class="game-card">
+                        <div class="game-header">
+                            <div class="game-icon"><i class="fas fa-key"></i></div>
+                            <div class="game-info">
+                                <div class="game-title">Password Security</div>
+                                <div class="game-subtitle">Learn secure password practices</div>
+                            </div>
+                        </div>
+                        <a href="/map/minigame/password" class="play-button">
+                            <i class="fas fa-play"></i> Start Challenge
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
-    
-    <!-- Audio controls -->
-    <div class="audio-controls">
-        <span id="audio-icon">🔊</span>
-        <span>SYNTH</span>
-    </div>
 
+    <script>
+        // Create floating particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            particle.style.opacity = Math.random();
+            document.querySelector('.floating-particles').appendChild(particle);
 
-        </div>
-    </div>
-</div>
-    
-    <!-- Background music -->
-    <audio id="bgMusic" autoplay loop>
-        <source src="{{ url_for('static', filename='synth.mp3') }}" type="audio/mpeg">
-    </audio>
-    {% include 'save_load_modal.html' %}
-    <script>
-        // Add audio toggle functionality
-        const audioControls = document.querySelector('.audio-controls');
-        const audioIcon = document.getElementById('audio-icon');
-        const bgMusic = document.getElementById('bgMusic');
-        
-        audioControls.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play();
-                audioIcon.textContent = '🔊';
-            } else {
-                bgMusic.pause();
-                audioIcon.textContent = '🔇';
-            }
-        });
-        
-        // Randomly position particles
-        document.addEventListener('DOMContentLoaded', () => {
-            const particles = document.querySelectorAll('.particle');
-            particles.forEach(particle => {
-                const size = Math.random() * 3 + 1;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${Math.random() * 100}%`;
-            });
-        });
-    </script>
-    
-    <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const saveBtn = document.getElementById('saveGameBtn');
-    const modal = document.getElementById('saveModal');
-    const confirmBtn = document.getElementById('confirmSave');
-    const saveNameInput = document.getElementById('saveName');
-    const saveStatus = document.getElementById('saveStatus');
-    
-    saveBtn.addEventListener('click', () => {
-        modal.style.display = 'block';
-        saveNameInput.value = ''; // Clear previous input
-        saveStatus.textContent = ''; // Clear status
-    });
-    
-    confirmBtn.addEventListener('click', async () => {
-        const saveName = saveNameInput.value || 'Autosave';
-        saveStatus.textContent = "Saving game...";
-        saveStatus.style.color = "#00ffe1"; // Cyberpunk teal
-        
-        try {
-            const formData = new FormData();
-            formData.append('save_name', saveName);
-            
-            const response = await fetch('/saves/save', {
-                method: 'POST',
-                body: formData
-            });
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if(data.status === 'success') {
-                saveStatus.innerHTML = "✅ Game saved successfully!";
-                saveStatus.style.color = "#00ff00"; // Green
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    saveStatus.textContent = "";
-                }, 2000);
-            } else {
-                throw new Error(data.message || 'Unknown error');
-            }
-        } catch (error) {
-            console.error('Save error:', error);
-            saveStatus.innerHTML = `❌ Error: ${error.message}`;
-            saveStatus.style.color = "#ff5555"; // Red
+            // Remove particle after animation
+            setTimeout(() => {
+                particle.remove();
+            }, 6000);
         }
-    });
-});
 
+        // Create particles periodically
+        setInterval(createParticle, 300);
+
+        // Animate progress bars and circles on load
+        window.addEventListener('load', () => {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 500);
+            });
+
+            const progressCircle = document.querySelector('.progress-circle');
+            if (progressCircle) {
+                const progress = progressCircle.style.getPropertyValue('--progress');
+                progressCircle.style.setProperty('--progress', '0deg');
+                setTimeout(() => {
+                    progressCircle.style.setProperty('--progress', progress);
+                }, 1000);
+            }
+        });
+
+        // Add smooth scrolling to anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
     </script>
-
-    <script src="{{ url_for('static', filename='js/saves.js') }}"></script>
-
 </body>
 </html>

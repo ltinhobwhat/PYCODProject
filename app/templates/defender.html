@@ -1,25 +1,600 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Defense Challenge</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{% block title %}SQL Defense Trainer{% endblock %}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
 
-{% block content %}
-<div class="container">
-    <h1>SQL Defense Trainer</h1>
-    <p>How would you protect this code?</p>
-    <pre>SELECT * FROM users WHERE username = ? AND password = ?;</pre>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-    <form method="post">
-        {% for option in options %}
-            <button type="submit" name="defense_choice" value="{{ option }}">{{ option }}</button><br>
-        {% endfor %}
-    </form>
+        .nav-links {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
 
-    {% if result %}
-        <div class="result">{{ result }}</div>
-    {% endif %}
+        .nav-links a {
+            color: #00ff88;
+            text-decoration: none;
+            margin: 0 1rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
 
-    <p style="margin-top: 1rem;">
-        <a href="{{ url_for('menu.menu') }}">⬅️ Back to Menu</a>
-    </p>
-</div>
-{% endblock %}
+        .nav-links a:hover {
+            background: rgba(0, 255, 136, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            color: #00ff88;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .game-description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .challenge-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            margin-bottom: 2rem;
+        }
+
+        .scenario-section {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .scenario-title {
+            color: #ffa500;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .vulnerable-code {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .code-label {
+            color: #ff4757;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 5px;
+            border-left: 4px solid #ff4757;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .secure-code {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .secure-code .code-label {
+            color: #00ff88;
+        }
+
+        .secure-code .code-block {
+            border-left-color: #00ff88;
+        }
+
+        .question-section {
+            margin-bottom: 2rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+        }
+
+        .options-container {
+            margin-bottom: 2rem;
+        }
+
+        .option-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .option-item:hover {
+            border-color: rgba(0, 255, 136, 0.5);
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateX(5px);
+        }
+
+        .option-item.selected {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .option-item.correct {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.3);
+        }
+
+        .option-item.incorrect {
+            border-color: #ff4757;
+            background: rgba(255, 71, 87, 0.2);
+        }
+
+        .option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 255, 136, 0.5);
+            border-radius: 50%;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        .option-radio.checked {
+            background: #00ff88;
+            border-color: #00ff88;
+        }
+
+        .option-radio.checked::after {
+            content: '●';
+            color: #000000;
+            font-size: 0.8rem;
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        .option-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        .option-code {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.5rem;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-button:hover {
+            background: linear-gradient(135deg, #00cc6a, #009955);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .submit-button:disabled {
+            background: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .result-correct {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+
+        .result-incorrect {
+            background: rgba(255, 69, 69, 0.2);
+            border: 1px solid #ff4545;
+            color: #ff4545;
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            font-weight: normal;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .defense-info {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .defense-info h3 {
+            color: #00ff88;
+            margin-bottom: 1rem;
+        }
+
+        .defense-techniques {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .defense-techniques li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .defense-techniques li::before {
+            content: '🛡️';
+            position: absolute;
+            left: 0;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-button {
+            padding: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .completion-status {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        @keyframes shield-glow {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
+        }
+
+        .game-title {
+            animation: shield-glow 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .option-item {
+                padding: 1rem;
+            }
+            
+            .code-block {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/"><i class="fas fa-home"></i> Home</a>
+            <a href="/map"><i class="fas fa-map"></i> Challenge Map</a>
+            <a href="/leaderboard/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+        </div>
+
+        <div class="game-header">
+            <h1 class="game-title">
+                <i class="fas fa-shield-alt"></i> SQL Defense Training
+            </h1>
+            <p class="game-description">
+                Learn how to protect applications from SQL injection attacks using secure coding practices.
+            </p>
+        </div>
+
+        <div class="defense-info">
+            <h3><i class="fas fa-info-circle"></i> Defense Strategies</h3>
+            <ul class="defense-techniques">
+                <li>Use parameterized queries (prepared statements)</li>
+                <li>Implement proper input validation and sanitization</li>
+                <li>Apply the principle of least privilege to database users</li>
+                <li>Use stored procedures with proper parameter handling</li>
+                <li>Enable database logging and monitoring</li>
+            </ul>
+        </div>
+
+        <div class="challenge-card">
+            <div class="scenario-section">
+                <div class="scenario-title">
+                    <i class="fas fa-exclamation-triangle"></i> Security Scenario
+                </div>
+                <p>You've discovered this vulnerable login code in your application. How should you secure it against SQL injection attacks?</p>
+            </div>
+
+            <div class="vulnerable-code">
+                <div class="code-label">
+                    <i class="fas fa-bug"></i> Vulnerable Code:
+                </div>
+                <div class="code-block">SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "';</div>
+            </div>
+
+            <div class="secure-code">
+                <div class="code-label">
+                    <i class="fas fa-shield-alt"></i> Secure Alternative:
+                </div>
+                <div class="code-block">SELECT * FROM users WHERE username = ? AND password = ?;</div>
+            </div>
+
+            <div class="question-section">
+                <div class="question-text">
+                    <i class="fas fa-question-circle"></i> What is the best defense against SQL injection?
+                </div>
+
+                <form method="POST" id="defense-form">
+                    <div class="options-container">
+                        {% for option in options %}
+                        <div class="option-item" onclick="selectOption(this, '{{ option }}')">
+                            <div class="option-radio" id="radio-{{ loop.index0 }}"></div>
+                            <div class="option-content">
+                                <div class="option-title">
+                                    {% if 'parameterized' in option %}
+                                        <i class="fas fa-shield-alt"></i> {{ option }}
+                                    {% elif 'Escape' in option %}
+                                        <i class="fas fa-exclamation-triangle"></i> {{ option }}
+                                    {% else %}
+                                        <i class="fas fa-times-circle"></i> {{ option }}
+                                    {% endif %}
+                                </div>
+                                <div class="option-description">
+                                    {% if 'parameterized' in option %}
+                                        The gold standard for preventing SQL injection. Parameters are handled separately from the SQL code.
+                                    {% elif 'Escape' in option %}
+                                        Manually escaping can be error-prone and may miss edge cases. Not recommended as the primary defense.
+                                    {% else %}
+                                        Never trust user input without validation. This approach is extremely dangerous.
+                                    {% endif %}
+                                </div>
+                                {% if 'parameterized' in option %}
+                                <div class="option-code">
+                                    PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username = ? AND password = ?");
+                                </div>
+                                {% endif %}
+                            </div>
+                            <input type="radio" name="defense_choice" value="{{ option }}" style="display: none;">
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="submit-button" id="submit-btn" disabled>
+                        <i class="fas fa-check-circle"></i> Submit Defense Strategy
+                    </button>
+                </form>
+
+                {% if result %}
+                <div class="result-section {{ 'result-correct' if '✅' in result else 'result-incorrect' }}">
+                    {{ result|safe }}
+                    <div class="explanation">
+                        {% if '✅' in result %}
+                        <strong>Excellent choice!</strong> Parameterized queries separate SQL code from data, making injection impossible. 
+                        The database treats user input as literal values, not executable code.
+                        {% else %}
+                        <strong>Not the best approach.</strong> While other methods may provide some protection, 
+                        parameterized queries are the most reliable and widely recommended defense against SQL injection.
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if completed %}
+                <div class="completion-status">
+                    <i class="fas fa-trophy"></i> Congratulations! You've mastered SQL defense strategies!
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/map" class="action-button">
+                <i class="fas fa-map"></i> Challenge Map
+            </a>
+            <a href="/leaderboard" class="action-button">
+                <i class="fas fa-trophy"></i> Leaderboard
+            </a>
+            <a href="/leaderboard/dashboard" class="action-button">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a>
+            <a href="/" class="action-button">
+                <i class="fas fa-home"></i> Main Menu
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let selectedOption = null;
+
+        function selectOption(element, value) {
+            // Clear previous selection
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
+                item.querySelector('.option-radio').classList.remove('checked');
+                item.querySelector('input[type="radio"]').checked = false;
+            });
+
+            // Select current option
+            element.classList.add('selected');
+            element.querySelector('.option-radio').classList.add('checked');
+            element.querySelector('input[type="radio"]').checked = true;
+            
+            selectedOption = value;
+            document.getElementById('submit-btn').disabled = false;
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            const options = document.querySelectorAll('.option-item');
+            if (e.key === '1' && options[0]) {
+                options[0].click();
+            } else if (e.key === '2' && options[1]) {
+                options[1].click();
+            } else if (e.key === '3' && options[2]) {
+                options[2].click();
+            } else if (e.key === 'Enter' && selectedOption) {
+                document.getElementById('defense-form').submit();
+            }
+        });
+
+        // Celebration animation for completion
+        {% if completed %}
+        setTimeout(() => {
+            for (let i = 0; i < 15; i++) {
+                createConfetti();
+            }
+        }, 1000);
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.top = '-10px';
+            confetti.style.fontSize = '20px';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.zIndex = '1000';
+            confetti.textContent = ['🎉', '🎊', '🛡️', '⭐', '💫', '🏆'][Math.floor(Math.random() * 6)];
+            
+            document.body.appendChild(confetti);
+            
+            const animation = confetti.animate([
+                { transform: 'translateY(-10px) rotate(0deg)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 10}px) rotate(360deg)`, opacity: 0 }
+            ], {
+                duration: 3000,
+                easing: 'linear'
+            });
+            
+            animation.onfinish = () => confetti.remove();
+        }
+        {% endif %}
+
+        // Add hover effects to options
+        document.querySelectorAll('.option-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.backgroundColor = 'rgba(0, 255, 136, 0.05)';
+                }
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('selected')) {
+                    this.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
-# auth.py
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+# app/auth.py (Emergency Fix)
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required
-from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User  # This imports the db instance from models.py
+import sqlite3
+import hashlib
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -12,14 +12,58 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        # Proper query using the db session
-        user = db.session.query(User).filter_by(username=username).first()
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
         
-        if user and check_password_hash(user.password_hash, password):
+        conn = sqlite3.connect('game.db')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM users WHERE username = ? AND password_hash = ?', 
+                      (username, password_hash))
+        user_data = cursor.fetchone()
+        conn.close()
+        
+        if user_data:
+            from .simple_user import SimpleUser
+            user = SimpleUser(user_data)
             login_user(user)
-            return redirect(url_for('menu.menu'))
-        flash('Invalid username or password')
+            # DIREKT zum Success-Page ohne Menu
+            return redirect(url_for('auth.success'))
+        else:
+            flash('Invalid username or password')
+    
     return render_template('login.html')
+
+@auth_bp.route('/success')
+@login_required
+def success():
+    from flask_login import current_user
+    return f'''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Login Success</title>
+        <style>
+            body {{ font-family: Arial; background: #0f0f23; color: white; padding: 2rem; text-align: center; }}
+            h1 {{ color: #00ff88; }}
+            .success-box {{ background: rgba(0,255,136,0.1); padding: 2rem; border-radius: 10px; margin: 2rem auto; max-width: 600px; }}
+            a {{ color: #00ff88; text-decoration: none; font-weight: bold; padding: 0.5rem 1rem; background: rgba(0,255,136,0.2); border-radius: 5px; margin: 0.5rem; display: inline-block; }}
+            a:hover {{ background: rgba(0,255,136,0.3); }}
+        </style>
+    </head>
+    <body>
+        <div class="success-box">
+            <h1>🎉 Welcome {current_user.username}!</h1>
+            <p>Your CyberSec Academy account is now active.</p>
+            <p>Score: {current_user.total_score} points | Games: {current_user.games_completed}/6</p>
+            
+            <div style="margin: 2rem 0;">
+                <a href="/menu">🏠 Main Menu</a>
+                <a href="/map">🗺️ Challenge Map</a>
+                <a href="/auth/logout">🚪 Logout</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    '''
 
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -28,31 +72,46 @@ def signup():
         password = request.form.get('password')
         email = request.form.get('email')
         
-        # Check for existing user
-        if db.session.query(User).filter_by(username=username).first():
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        conn = sqlite3.connect('game.db')
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT id FROM users WHERE username = ?', (username,))
+        if cursor.fetchone():
             flash('Username already exists')
+            conn.close()
             return redirect(url_for('auth.signup'))
-            
+        
         try:
-            new_user = User(username=username, email=email)
-            new_user.set_password(password)
+            cursor.execute('''
+                INSERT INTO users (username, email, password_hash, total_score, games_completed)
+                VALUES (?, ?, ?, 0, 0)
+            ''', (username, email, password_hash))
+            conn.commit()
             
-            db.session.add(new_user)
-            db.session.commit()
+            user_id = cursor.lastrowid
+            cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+            user_data = cursor.fetchone()
+            conn.close()
             
-            login_user(new_user)
-            return redirect(url_for('menu.menu'))
+            from .simple_user import SimpleUser
+            user = SimpleUser(user_data)
+            login_user(user)
+            
+            # DIREKT zum Success-Page
+            return redirect(url_for('auth.success'))
             
         except Exception as e:
-            db.session.rollback()
+            conn.rollback()
+            conn.close()
             flash('Error creating account. Please try again.')
             return redirect(url_for('auth.signup'))
         
     return render_template('signup.html')
 
-# In auth.py, update the logout route:
 @auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))  # Make sure this matches your blueprint name
+    return redirect(url_for('auth.login'))

@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Flask
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db

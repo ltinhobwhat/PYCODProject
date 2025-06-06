@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberSec Academy - Leaderboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 0;
+            border-bottom: 2px solid #00ff88;
+            margin-bottom: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(0, 255, 136, 0.2);
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .leaderboard-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: #00ff88;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        .leaderboard-table th,
+        .leaderboard-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .leaderboard-table th {
+            background: rgba(0, 255, 136, 0.2);
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .leaderboard-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .rank {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
+        .rank-3 { color: #cd7f32; }
+
+        .username {
+            font-weight: 600;
+        }
+
+        .score {
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            transition: width 0.3s ease;
+        }
+
+        .achievement-badges {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(0, 255, 136, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(0, 255, 136, 0.5);
+        }
+
+        .medal {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .game-stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .game-name {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #00ff88;
+        }
+
+        .completion-rate {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .leaderboard-table {
+                font-size: 0.9rem;
+            }
+            
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 0.5rem;
+            }
+            
+            .achievement-badges {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-shield-alt"></i> CyberSec Academy
+                </div>
+                <div class="nav-links">
+                    <a href="/"><i class="fas fa-home"></i> Home</a>
+                    <a href="/leaderboard/dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+                    <a href="/leaderboard/statistics"><i class="fas fa-chart-bar"></i> Statistics</a>
+                    <a href="/auth/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_users }}</div>
+                <div class="stat-label">Total Players</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ leaderboard[0].total_score if leaderboard else 0 }}</div>
+                <div class="stat-label">Highest Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Security Challenges</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ leaderboard | selectattr('progress_percentage', 'equalto', 100) | list | length }}</div>
+                <div class="stat-label">Complete Players</div>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-section">
+            <h2 class="section-title">
+                <i class="fas fa-trophy"></i> Global Leaderboard
+            </h2>
+            
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Score</th>
+                        <th>Games Completed</th>
+                        <th>Progress</th>
+                        <th>Achievements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in leaderboard %}
+                    <tr>
+                        <td>
+                            <span class="rank rank-{{ player.rank if player.rank <= 3 else 'other' }}">
+                                {% if player.rank == 1 %}
+                                    <span class="medal">🥇</span>
+                                {% elif player.rank == 2 %}
+                                    <span class="medal">🥈</span>
+                                {% elif player.rank == 3 %}
+                                    <span class="medal">🥉</span>
+                                {% endif %}
+                                #{{ player.rank }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="username">{{ player.username }}</div>
+                            <small style="opacity: 0.7;">Joined {{ player.created_at[:10] if player.created_at else 'Unknown' }}</small>
+                        </td>
+                        <td>
+                            <span class="score">{{ player.total_score }}</span> pts
+                        </td>
+                        <td>
+                            {{ player.completed_games }}/6
+                        </td>
+                        <td>
+                            <div>{{ "%.1f"|format(player.progress_percentage) }}%</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: {{ player.progress_percentage }}%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="achievement-badges">
+                                {% for i in range(player.achievement_count or 0) %}
+                                    <span class="badge">🏆</span>
+                                {% endfor %}
+                                {% if player.achievement_count %}
+                                    <small>{{ player.achievement_count }} badges</small>
+                                {% else %}
+                                    <small style="opacity: 0.5;">No badges yet</small>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Game Statistics -->
+        <div class="leaderboard-section" style="margin-top: 2rem;">
+            <h2 class="section-title">
+                <i class="fas fa-gamepad"></i> Challenge Statistics
+            </h2>
+            
+            <div class="games-grid">
+                {% for game_name, game_data in stats.games.items() %}
+                <div class="game-stat">
+                    <div class="game-name">{{ game_data.name }}</div>
+                    <div class="completion-rate">{{ "%.1f"|format(game_data.completion_rate) }}%</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">
+                        {{ game_data.completed }}/{{ game_data.attempted }} completed
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh leaderboard every 30 seconds
+        setInterval(() => {
+            location.reload();
+        }, 30000);
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+                
