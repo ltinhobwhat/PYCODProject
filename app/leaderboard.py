@@ -235,6 +235,10 @@ def dashboard():
         'sqldefender': {'name': 'SQL Defense', 'max_score': 1}
     }
     
+    # Calculate progress percentage safely
+    progress_percentage = dashboard_data['progress_percentage']
+    progress_degrees = progress_percentage * 3.6
+    
     return f'''
     <!DOCTYPE html>
     <html>
@@ -289,7 +293,7 @@ def dashboard():
                 width: 100px; 
                 height: 100px; 
                 border-radius: 50%; 
-                background: conic-gradient(#00ff88 0deg, #00ff88 {dashboard_data['progress_percentage'] * 3.6}deg, rgba(255,255,255,0.2) {dashboard_data['progress_percentage'] * 3.6}deg);
+                background: conic-gradient(#00ff88 0deg, #00ff88 {progress_degrees}deg, rgba(255,255,255,0.2) {progress_degrees}deg);
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
@@ -325,7 +329,7 @@ def dashboard():
             <div class="user-stats">
                 <h2>Welcome back, {dashboard_data['user']['username']}! 👋</h2>
                 <div class="progress-circle">
-                    <div class="progress-text">{dashboard_data['progress_percentage']:.0f}%</div>
+                    <div class="progress-text">{progress_percentage:.0f}%</div>
                 </div>
                 <p><strong>Total Score:</strong> {dashboard_data['user']['total_score']} points</p>
                 <p><strong>Games Completed:</strong> {dashboard_data['user']['games_completed']}/6</p>
