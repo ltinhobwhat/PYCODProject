@@ -45,6 +45,28 @@ def leaderboard():
     total_users = cursor.fetchone()[0]
     conn.close()
     
+    # Build the table rows safely
+    table_rows = ""
+    for player in leaderboard_data:
+        rank_class = "rank-1" if player['rank'] == 1 else "rank-2" if player['rank'] == 2 else "rank-3" if player['rank'] == 3 else "rank-other"
+        rank_emoji = "🥇" if player['rank'] == 1 else "🥈" if player['rank'] == 2 else "🥉" if player['rank'] == 3 else ""
+        
+        table_rows += f'''
+        <div class="table-row">
+            <div class="rank {rank_class}">
+                {rank_emoji} #{player['rank']}
+            </div>
+            <div class="username">{player['username']}</div>
+            <div class="score">{player['total_score']} pts</div>
+            <div>{player['games_completed']}/6</div>
+            <div>{player['progress_percentage']:.1f}%</div>
+        </div>
+        '''
+    
+    # Calculate stats safely
+    highest_score = leaderboard_data[0]['total_score'] if leaderboard_data else 0
+    complete_players = len([p for p in leaderboard_data if p['progress_percentage'] == 100])
+    
     return f'''
     <!DOCTYPE html>
     <html>
@@ -132,7 +154,7 @@ def leaderboard():
                     <div class="stat-label">Total Players</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">{leaderboard_data[0]['total_score'] if leaderboard_data else 0}</div>
+                    <div class="stat-number">{highest_score}</div>
                     <div class="stat-label">Highest Score</div>
                 </div>
                 <div class="stat-card">
@@ -140,7 +162,7 @@ def leaderboard():
                     <div class="stat-label">Security Challenges</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">{len([p for p in leaderboard_data if p['progress_percentage'] == 100])}</div>
+                    <div class="stat-number">{complete_players}</div>
                     <div class="stat-label">Complete Players</div>
                 </div>
             </div>
@@ -154,17 +176,7 @@ def leaderboard():
                     <div>Progress</div>
                 </div>
                 
-                {"".join([f'''
-                <div class="table-row">
-                    <div class="rank rank-{player['rank'] if player['rank'] <= 3 else 'other'}">
-                        {'🥇' if player['rank'] == 1 else '🥈' if player['rank'] == 2 else '🥉' if player['rank'] == 3 else ''} #{player['rank']}
-                    </div>
-                    <div class="username">{player['username']}</div>
-                    <div class="score">{player['total_score']} pts</div>
-                    <div>{player['games_completed']}/6</div>
-                    <div>{player['progress_percentage']:.1f}%</div>
-                </div>
-                ''' for player in leaderboard_data])}
+                {table_rows}
             </div>
         </div>
     </body>
@@ -176,10 +188,37 @@ def leaderboard():
 def dashboard():
     """Temporary simple dashboard"""
     return '''
-    <h1>Dashboard Coming Soon!</h1>
-    <p>Dashboard temporarily disabled due to technical issues.</p>
-    <a href="/leaderboard">← Back to Leaderboard</a>
-    <a href="/menu">🏠 Main Menu</a>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Dashboard</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: #0f0f23;
+                color: white;
+                padding: 2rem;
+                text-align: center;
+            }
+            h1 { color: #00ff88; }
+            a {
+                color: #00ff88;
+                text-decoration: none;
+                margin: 1rem;
+                padding: 0.5rem 1rem;
+                background: rgba(0,255,136,0.2);
+                border-radius: 5px;
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>📊 Dashboard Coming Soon!</h1>
+        <p>Dashboard temporarily disabled due to technical issues.</p>
+        <a href="/leaderboard">← Back to Leaderboard</a>
+        <a href="/menu">🏠 Main Menu</a>
+    </body>
+    </html>
     '''
 
 @leaderboard_bp.route('/api/leaderboard')
