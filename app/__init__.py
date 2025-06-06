@@ -15,7 +15,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(user_id):
-        return db.session.get(User, int(user_id))
+        return db.session.get(User, user_id)
 
     # Blueprints (importe les autres fichiers .py du projet)
     from .pswdChecker import pswd_app
@@ -26,7 +26,6 @@ def create_app():
     from .hashgame import hashgame_bp
     from .sqlinjector import sqlinjector_bp
     from .auth import auth_bp
-    from .saves import saves_bp
 
     app.register_blueprint(menu_bp)
     app.register_blueprint(pswd_app, url_prefix='/pswdChecker')
@@ -36,8 +35,6 @@ def create_app():
     app.register_blueprint(hashgame_bp, url_prefix='/hashgame')
     app.register_blueprint(sqlinjector_bp, url_prefix='/sqlinjector')
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    app.register_blueprint(saves_bp)
-
     with app.app_context():
         db.create_all()
 

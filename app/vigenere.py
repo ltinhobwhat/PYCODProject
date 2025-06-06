@@ -1,6 +1,5 @@
 import random
 from flask import Blueprint, render_template, request, session, redirect, url_for
-from .save_manager import save_progress, get_progress
 
 vigenere_bp = Blueprint('vigenere', __name__, template_folder='templates')
 
@@ -21,7 +20,6 @@ def vigenere_encrypt(text, key):
 @vigenere_bp.route("/", methods=["GET", "POST"])
 def index():
     # Load previous progress
-    progress = get_progress('vigenere')
     
     if "score" not in session:
         session["score"] = 0
@@ -46,14 +44,7 @@ def index():
         current_percentage = (session["score"] / session["total"]) * 100
         completed = session["score"] >= 5  # Complete after 5 correct answers
         
-        save_progress(
-            game_name='vigenere',
-            score=session["score"],
-            completed=completed,
-            level=1,
-            accuracy=current_percentage,
-            total_attempts=session["total"]
-        )
+        
 
     # New word/encryption for each load
     word = random.choice(WORDS)

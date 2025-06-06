@@ -4,7 +4,6 @@
 import random
 import hashlib
 from flask import Blueprint, render_template, request, session
-from .save_manager import save_progress, get_progress
 
 hashgame_bp = Blueprint('hashgame', __name__, template_folder='templates')
 
@@ -18,7 +17,6 @@ HASH_ALGOS = {
 @hashgame_bp.route("/", methods=["GET", "POST"])
 def index():
     # Load previous progress
-    progress = get_progress('hashgame')
     
     # Initialize session data
     if "hash_score" not in session:
@@ -40,14 +38,7 @@ def index():
         current_percentage = (session["hash_score"] / session["hash_total"]) * 100
         completed = session["hash_score"] >= 10  # Complete after 10 correct answers
         
-        save_progress(
-            game_name='hashgame',
-            score=session["hash_score"],
-            completed=completed,
-            level=1,
-            accuracy=current_percentage,
-            total_attempts=session["hash_total"]
-        )
+
         
         # Generate new challenge after answer
         word, algo, hashed_word = generate_hash_challenge()
@@ -57,7 +48,7 @@ def index():
                              result=result,
                              score=session["hash_score"],
                              total=session["hash_total"],
-                             progress=progress)
+                             )
     
     # First load
     word, algo, hashed_word = generate_hash_challenge()
@@ -66,7 +57,7 @@ def index():
                          correct_algo=algo,
                          score=session.get("hash_score", 0),
                          total=session.get("hash_total", 0),
-                         progress=progress)
+                         )
 
 def generate_hash_challenge():
     word = random.choice(WORDS)

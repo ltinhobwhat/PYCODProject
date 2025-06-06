@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, redirect, session, url_for
-from .save_manager import save_progress, get_progress
 import random
 
 quiz_bp = Blueprint("quiz", __name__, template_folder="templates/quiz")
@@ -10,7 +9,6 @@ NUM_QUESTIONS = 10
 @quiz_bp.route("/", methods=["GET", "POST"])
 def index():
     # Load previous progress
-    progress = get_progress('quiz')
     
     if "quiz_questions" not in session or "quiz_index" not in session:
         num_to_pick = min(NUM_QUESTIONS, len(QUESTIONS))
@@ -36,7 +34,7 @@ def index():
             return redirect(url_for("quiz.result"))
 
     question = quiz_questions[index]
-    return render_template("quiz_question.html", question=question, index=index + 1, total=total, progress=progress)
+    return render_template("quiz_question.html", question=question, index=index + 1, total=total)
 
 @quiz_bp.route("/result")
 def result():
@@ -47,14 +45,7 @@ def result():
     percentage = (score / total) * 100
     completed = percentage >= 70  # Consider 70% as completion threshold
     
-    save_progress(
-        game_name='quiz',
-        score=int(percentage),
-        completed=completed,
-        level=1,
-        correct_answers=score,
-        total_questions=total
-    )
+
     
     session.pop('quiz_questions', None)
     session.pop('quiz_index', None)
