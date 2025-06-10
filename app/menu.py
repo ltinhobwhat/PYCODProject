@@ -1,4 +1,4 @@
-# app/menu.py - Revamped as Navigation Hub
+# app/menu.py (Navigation Hub - Games removed, only Map/Leaderboard/Dashboard access)
 from flask import Blueprint, render_template, redirect, url_for
 from flask_login import login_required, current_user
 
@@ -14,7 +14,6 @@ def menu():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>CyberSec Academy - Command Center</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
         <style>
             * {{
                 margin: 0;
@@ -23,11 +22,10 @@ def menu():
             }}
 
             body {{
-                font-family: 'Segoe UI', 'Orbitron', sans-serif;
+                font-family: 'Segoe UI', sans-serif;
                 background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 50%, #2d1b69 100%);
                 color: #ffffff;
                 min-height: 100vh;
-                overflow-x: hidden;
                 position: relative;
             }}
 
@@ -52,45 +50,6 @@ def menu():
                 100% {{ transform: translate(50px, 50px); }}
             }}
 
-            /* Floating orbs */
-            .orb {{
-                position: fixed;
-                border-radius: 50%;
-                background: radial-gradient(circle, rgba(0, 255, 136, 0.3), transparent);
-                animation: float 15s infinite ease-in-out;
-                z-index: -1;
-            }}
-
-            .orb1 {{
-                width: 200px;
-                height: 200px;
-                top: 10%;
-                left: 10%;
-                animation-delay: 0s;
-            }}
-
-            .orb2 {{
-                width: 150px;
-                height: 150px;
-                top: 70%;
-                right: 15%;
-                animation-delay: 5s;
-            }}
-
-            .orb3 {{
-                width: 100px;
-                height: 100px;
-                top: 40%;
-                left: 80%;
-                animation-delay: 10s;
-            }}
-
-            @keyframes float {{
-                0%, 100% {{ transform: translateY(0px) scale(1); }}
-                33% {{ transform: translateY(-20px) scale(1.1); }}
-                66% {{ transform: translateY(20px) scale(0.9); }}
-            }}
-
             .container {{
                 max-width: 1200px;
                 margin: 0 auto;
@@ -99,24 +58,10 @@ def menu():
                 z-index: 1;
             }}
 
-            /* Header Section */
+            /* Header */
             .header {{
                 text-align: center;
                 margin-bottom: 3rem;
-                position: relative;
-            }}
-
-            .header::before {{
-                content: "";
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 300px;
-                height: 300px;
-                background: radial-gradient(circle, rgba(0, 255, 136, 0.1), transparent);
-                border-radius: 50%;
-                z-index: -1;
             }}
 
             .logo {{
@@ -144,13 +89,12 @@ def menu():
             .subtitle {{
                 font-size: 1.1rem;
                 opacity: 0.9;
-                color: #ffffff;
                 max-width: 600px;
                 margin: 0 auto 2rem;
                 line-height: 1.6;
             }}
 
-            /* User Stats Panel */
+            /* Stats Panel */
             .stats-panel {{
                 background: rgba(0, 0, 0, 0.4);
                 backdrop-filter: blur(20px);
@@ -279,7 +223,7 @@ def menu():
             }}
 
             .nav-card:hover .nav-icon {{
-                transform: scale(1.1) rotateY(15deg);
+                transform: scale(1.1);
                 text-shadow: 0 0 30px rgba(0, 255, 136, 1);
             }}
 
@@ -336,9 +280,6 @@ def menu():
                 transition: all 0.3s ease;
                 text-transform: uppercase;
                 letter-spacing: 1px;
-                display: inline-flex;
-                align-items: center;
-                gap: 0.8rem;
             }}
 
             .logout-btn:hover {{
@@ -350,79 +291,28 @@ def menu():
 
             /* Responsive Design */
             @media (max-width: 768px) {{
-                .container {{
-                    padding: 1rem;
-                }}
-
-                .logo {{
-                    font-size: 2.5rem;
-                }}
-
-                .nav-grid {{
-                    grid-template-columns: 1fr;
-                    gap: 1.5rem;
-                }}
-
-                .stats-grid {{
-                    grid-template-columns: repeat(2, 1fr);
-                    gap: 1rem;
-                }}
-
-                .nav-card {{
-                    padding: 2rem;
-                }}
-
-                .nav-icon {{
-                    font-size: 3rem;
-                }}
-
-                .nav-title {{
-                    font-size: 1.5rem;
-                }}
-            }}
-
-            /* Security scanner effect */
-            .scanner-line {{
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 2px;
-                background: linear-gradient(90deg, transparent, #00ff88, transparent);
-                animation: scan 8s linear infinite;
-                z-index: 10;
-                opacity: 0.6;
-            }}
-
-            @keyframes scan {{
-                0% {{ top: 0; }}
-                100% {{ top: 100vh; }}
+                .container {{ padding: 1rem; }}
+                .logo {{ font-size: 2.5rem; }}
+                .nav-grid {{ grid-template-columns: 1fr; gap: 1.5rem; }}
+                .stats-grid {{ grid-template-columns: repeat(2, 1fr); gap: 1rem; }}
+                .nav-card {{ padding: 2rem; }}
+                .nav-icon {{ font-size: 3rem; }}
+                .nav-title {{ font-size: 1.5rem; }}
             }}
         </style>
     </head>
     <body>
-        <!-- Floating orbs -->
-        <div class="orb orb1"></div>
-        <div class="orb orb2"></div>
-        <div class="orb orb3"></div>
-        
-        <!-- Scanner effect -->
-        <div class="scanner-line"></div>
-
         <div class="container">
             <!-- Header Section -->
             <div class="header">
-                <h1 class="logo">
-                    <i class="fas fa-shield-alt"></i> CYBERSEC ACADEMY
-                </h1>
-                <div class="welcome-text">Welcome back, Agent {current_user.username}</div>
+                <h1 class="logo">🛡️ CyberSec Academy</h1>
+                <div class="welcome-text">Welcome back, {current_user.username}!</div>
                 <p class="subtitle">
-                    Your mission: Master cybersecurity through immersive challenges and rise through the ranks. 
-                    The digital battlefield awaits your expertise.
+                    Navigate to the challenge map to access all security missions, check your ranking, or analyze your progress.
                 </p>
             </div>
 
-            <!-- User Stats Panel -->
+            <!-- User Stats Panel (same as original) -->
             <div class="stats-panel">
                 <div class="stats-grid">
                     <div class="stat-item">
@@ -431,11 +321,7 @@ def menu():
                     </div>
                     <div class="stat-item">
                         <span class="stat-value">{current_user.games_completed}/6</span>
-                        <div class="stat-label">Missions Complete</div>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">#{current_user.get_rank()}</span>
-                        <div class="stat-label">Global Rank</div>
+                        <div class="stat-label">Games Completed</div>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value">Rising Hacker</span>
@@ -444,46 +330,40 @@ def menu():
                 </div>
             </div>
 
-            <!-- Navigation Section -->
+            <!-- Navigation Section (NO GAMES - only navigation) -->
             <div class="nav-section">
-                <h2 class="section-title">Command Center</h2>
+                <h2 class="section-title">Navigation</h2>
                 <div class="nav-grid">
                     <!-- Challenge Map -->
                     <a href="/map" class="nav-card">
-                        <div class="nav-badge">Primary</div>
-                        <div class="nav-icon">
-                            <i class="fas fa-map-marked-alt"></i>
-                        </div>
+                        <div class="nav-badge">Main</div>
+                        <div class="nav-icon">🗺️</div>
                         <div class="nav-title">Challenge Map</div>
                         <div class="nav-description">
-                            Navigate through the cyber city and access all security challenges. 
-                            Each district offers unique learning experiences and rewards.
+                            Access all security challenges through the interactive cyber city map. 
+                            Each district offers unique learning experiences.
                         </div>
                     </a>
 
                     <!-- Leaderboard -->
                     <a href="/leaderboard" class="nav-card">
                         <div class="nav-badge">Compete</div>
-                        <div class="nav-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
+                        <div class="nav-icon">🏆</div>
                         <div class="nav-title">Leaderboard</div>
                         <div class="nav-description">
-                            See how you rank against other cybersecurity agents worldwide. 
-                            Climb the ranks and prove your expertise.
+                            See how you rank against other players worldwide. 
+                            Track your position and compete for the top spots.
                         </div>
                     </a>
 
                     <!-- Dashboard -->
                     <a href="/leaderboard/dashboard" class="nav-card">
-                        <div class="nav-badge">Analytics</div>
-                        <div class="nav-icon">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="nav-title">Analytics Dashboard</div>
+                        <div class="nav-badge">Stats</div>
+                        <div class="nav-icon">📊</div>
+                        <div class="nav-title">Dashboard</div>
                         <div class="nav-description">
-                            Track your detailed progress, performance metrics, and achievements. 
-                            Monitor your growth as a security professional.
+                            View detailed analytics of your progress and performance. 
+                            Track achievements and monitor your growth.
                         </div>
                     </a>
                 </div>
@@ -491,15 +371,12 @@ def menu():
 
             <!-- Logout Section -->
             <div class="logout-section">
-                <a href="/auth/logout" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Secure Logout
-                </a>
+                <a href="/auth/logout" class="logout-btn">🚪 Logout</a>
             </div>
         </div>
 
         <script>
-            // Add dynamic particle effects
+            // Simple particle effect
             function createParticle() {{
                 const particle = document.createElement('div');
                 particle.style.position = 'fixed';
@@ -516,7 +393,6 @@ def menu():
                 
                 const animation = particle.animate([
                     {{ transform: 'translateY(0px)', opacity: 0 }},
-                    {{ transform: 'translateY(-20px)', opacity: 1 }},
                     {{ transform: 'translateY(-100vh)', opacity: 0 }}
                 ], {{
                     duration: 6000,
@@ -526,61 +402,7 @@ def menu():
                 animation.onfinish = () => particle.remove();
             }}
 
-            // Create particles periodically
-            setInterval(createParticle, 300);
-
-            // Add mouse movement effects
-            document.addEventListener('mousemove', (e) => {{
-                const cards = document.querySelectorAll('.nav-card');
-                cards.forEach(card => {{
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {{
-                        const rotateX = (y - rect.height / 2) / 10;
-                        const rotateY = (x - rect.width / 2) / -10;
-                        card.style.transform = `translateY(-15px) scale(1.02) rotateX(${{rotateX}}deg) rotateY(${{rotateY}}deg)`;
-                    }}
-                }});
-            }});
-
-            // Add click sound effect simulation
-            document.querySelectorAll('.nav-card').forEach(card => {{
-                card.addEventListener('click', (e) => {{
-                    // Add a brief flash effect
-                    const flash = document.createElement('div');
-                    flash.style.position = 'absolute';
-                    flash.style.top = '0';
-                    flash.style.left = '0';
-                    flash.style.width = '100%';
-                    flash.style.height = '100%';
-                    flash.style.background = 'rgba(0, 255, 136, 0.3)';
-                    flash.style.pointerEvents = 'none';
-                    flash.style.borderRadius = '20px';
-                    card.appendChild(flash);
-                    
-                    setTimeout(() => flash.remove(), 200);
-                }});
-            }});
-
-            // Add typing effect to welcome text
-            const welcomeText = document.querySelector('.welcome-text');
-            if (welcomeText) {{
-                const originalText = welcomeText.textContent;
-                welcomeText.textContent = '';
-                let i = 0;
-                
-                const typeWriter = () => {{
-                    if (i < originalText.length) {{
-                        welcomeText.textContent += originalText.charAt(i);
-                        i++;
-                        setTimeout(typeWriter, 100);
-                    }}
-                }};
-                
-                setTimeout(typeWriter, 1000);
-            }}
+            setInterval(createParticle, 500);
         </script>
     </body>
     </html>
