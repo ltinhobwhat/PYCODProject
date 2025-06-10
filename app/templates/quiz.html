@@ -1,128 +1,260 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>CIA Quiz</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            background-color: #0a0a12;
-            background-image: radial-gradient(circle at 50% 50%, rgba(46, 12, 80, 0.3) 0%, transparent 60%), linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: #f8f8f2;
-            font-family: 'Rajdhani', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
-        }
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from datetime import datetime, timedelta
+import json
+import random
+import os
 
-        .container {
-            background: rgba(15, 12, 41, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 255, 225, 0.3);
-            border-radius: 15px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            box-shadow: 0 0 40px rgba(0, 255, 225, 0.2);
-            z-index: 10;
-            position: relative;
-        }
+# Initialize Flask app (if not already initialized in main app)
+app = Flask(__name__)
+app.secret_key = 'your-secret-key-here'  # Change this to a secure secret key
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #00ffe1;
-            text-align: center;
-        }
-
-        .question-block {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border: 1px solid rgba(0, 255, 225, 0.2);
-            border-radius: 10px;
-        }
-
-        label {
-            display: block;
-            margin: 5px 0;
-            cursor: pointer;
-        }
-
-        button {
-            background: rgba(15, 12, 41, 0.7);
-            color: #00ffe1;
-            border: 2px solid #00ffe1;
-            padding: 1rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        button:hover {
-            background: rgba(0, 255, 225, 0.2);
-            box-shadow: 0 0 20px rgba(0, 255, 225, 0.8);
-            transform: translateY(-3px);
-        }
-
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>CIA Triad Quiz</h1>
-    {% if score is defined %}
-    <p style="text-align: center; margin-bottom: 1rem;">
-        You scored <strong>{{ score }}</strong> out of <strong>{{ total }}</strong>!
-    </p>
-    {% endif %}
-    {% if score is defined %}
-<div style="margin-bottom: 1rem;">
-    <div style="background: #333; border-radius: 10px; overflow: hidden; height: 20px;">
-        <div style="width: {{ (score / total * 100)|round(0, 'floor') }}%; background: #00ffe1; height: 100%; transition: width 0.5s;"></div>
-    </div>
-</div>
-{% endif %}
-    <form method="post">
-        {% for question in questions %}
-            <div class="question-block">
-                <p><strong>{{ question.text }}</strong></p>
-                <label><input type="checkbox" name="q{{ loop.index0 }}" value="confidentiality"> Confidentiality</label>
-                <label><input type="checkbox" name="q{{ loop.index0 }}" value="integrity"> Integrity</label>
-                <label><input type="checkbox" name="q{{ loop.index0 }}" value="availability"> Availability</label>
-            </div>
-        {% endfor %}
-        <button type="submit">Submit</button>
-    </form>
-    <a href="{{ url_for('menu.menu') }}" style="display: block; margin-top: 1.5rem; text-align: center; color: #00ffe1; text-decoration: none; font-weight: bold;">
-    ⬅️ Back to Menu
-    </a>
-
-</div>
-
-</body>
-</html> -->
-{% extends 'base.html' %}
-
-{% block title %}Quiz{% endblock %}
-
-{% block style %}
-<style>
-    .question {
-        color: yellow;
-        font-weight: bold;
+# Quiz questions database
+QUIZ_QUESTIONS = [
+    {
+        "id": 1,
+        "question": "What is the primary purpose of a firewall in network security?",
+        "options": {
+            "A": "To encrypt all network traffic",
+            "B": "To monitor and control network traffic based on security rules",
+            "C": "To speed up internet connection",
+            "D": "To store user passwords securely"
+        },
+        "correct_answer": "B",
+        "category": "Network Security",
+        "difficulty": "Easy",
+        "points": 100,
+        "explanation": "A firewall acts as a barrier between trusted and untrusted networks, monitoring and controlling traffic based on predetermined security rules."
+    },
+    {
+        "id": 2,
+        "question": "Which type of malware encrypts files and demands payment for decryption?",
+        "options": {
+            "A": "Trojan Horse",
+            "B": "Spyware",
+            "C": "Ransomware",
+            "D": "Adware"
+        },
+        "correct_answer": "C",
+        "category": "Malware",
+        "difficulty": "Easy",
+        "points": 100,
+        "explanation": "Ransomware is malicious software that encrypts a victim's files and demands a ransom payment for the decryption key."
+    },
+    {
+        "id": 3,
+        "question": "What does 'phishing' refer to in cybersecurity?",
+        "options": {
+            "A": "A method of data encryption",
+            "B": "A social engineering attack to steal sensitive information",
+            "C": "A type of firewall configuration",
+            "D": "A network monitoring tool"
+        },
+        "correct_answer": "B",
+        "category": "Social Engineering",
+        "difficulty": "Easy",
+        "points": 100,
+        "explanation": "Phishing is a social engineering attack where attackers impersonate legitimate entities to trick victims into revealing sensitive information."
+    },
+    {
+        "id": 4,
+        "question": "Which protocol provides secure communication over the internet?",
+        "options": {
+            "A": "HTTP",
+            "B": "FTP",
+            "C": "HTTPS",
+            "D": "SMTP"
+        },
+        "correct_answer": "C",
+        "category": "Protocols",
+        "difficulty": "Easy",
+        "points": 100,
+        "explanation": "HTTPS (Hypertext Transfer Protocol Secure) uses SSL/TLS encryption to secure communication between web browsers and servers."
+    },
+    {
+        "id": 5,
+        "question": "What is two-factor authentication (2FA)?",
+        "options": {
+            "A": "Using two different passwords",
+            "B": "Authentication requiring two different forms of verification",
+            "C": "Logging in from two different devices",
+            "D": "Having two user accounts"
+        },
+        "correct_answer": "B",
+        "category": "Authentication",
+        "difficulty": "Easy",
+        "points": 100,
+        "explanation": "2FA requires users to provide two different authentication factors, typically something they know (password) and something they have (phone/token)."
+    },
+    {
+        "id": 6,
+        "question": "What is a DDoS attack?",
+        "options": {
+            "A": "Data Duplication of Service",
+            "B": "Distributed Denial of Service",
+            "C": "Direct Download of Software",
+            "D": "Dynamic Domain of Security"
+        },
+        "correct_answer": "B",
+        "category": "Attack Types",
+        "difficulty": "Medium",
+        "points": 200,
+        "explanation": "A DDoS attack overwhelms a target system with traffic from multiple sources, making it unavailable to legitimate users."
+    },
+    {
+        "id": 7,
+        "question": "Which of the following is NOT a common password best practice?",
+        "options": {
+            "A": "Using a mix of uppercase and lowercase letters",
+            "B": "Including numbers and special characters",
+            "C": "Using the same password for multiple accounts",
+            "D": "Making passwords at least 12 characters long"
+        },
+        "correct_answer": "C",
+        "category": "Password Security",
+        "difficulty": "Easy",
+        "points": 100,
+        "explanation": "Using the same password for multiple accounts is dangerous because if one account is compromised, all accounts become vulnerable."
+    },
+    {
+        "id": 8,
+        "question": "What is SQL injection?",
+        "options": {
+            "A": "A database backup method",
+            "B": "A code injection technique targeting databases",
+            "C": "A way to speed up database queries",
+            "D": "A database encryption method"
+        },
+        "correct_answer": "B",
+        "category": "Web Security",
+        "difficulty": "Medium",
+        "points": 200,
+        "explanation": "SQL injection is a web security vulnerability that allows attackers to interfere with database queries by injecting malicious SQL code."
+    },
+    {
+        "id": 9,
+        "question": "What does VPN stand for?",
+        "options": {
+            "A": "Virtual Private Network",
+            "B": "Very Protected Network",
+            "C": "Validated Public Network",
+            "D": "Virtual Protected Node"
+        },
+        "correct_answer": "A",
+        "category": "Network Security",
+        "difficulty": "Easy",
+        "points": 100,
+        "explanation": "VPN (Virtual Private Network) creates a secure, encrypted connection over a less secure network, such as the internet."
+    },
+    {
+        "id": 10,
+        "question": "Which encryption method uses the same key for both encryption and decryption?",
+        "options": {
+            "A": "Asymmetric encryption",
+            "B": "Symmetric encryption",
+            "C": "Hash encryption",
+            "D": "Public key encryption"
+        },
+        "correct_answer": "B",
+        "category": "Cryptography",
+        "difficulty": "Medium",
+        "points": 200,
+        "explanation": "Symmetric encryption uses the same key for both encryption and decryption, making it faster but requiring secure key exchange."
     }
-</style>
-{% endblock %}
+]
 
-{% block content %}
-<h1 class="question">Quelle est la capitale de la cybersécurité ?</h1>
-{% endblock %}
+class QuizSession:
+    """Manages individual quiz sessions"""
+    
+    def __init__(self, user_id, quiz_type='random', num_questions=5):
+        self.user_id = user_id
+        self.quiz_type = quiz_type
+        self.num_questions = num_questions
+        self.questions = self._select_questions()
+        self.current_question_index = 0
+        self.answers = {}
+        self.score = 0
+        self.start_time = datetime.now()
+        self.time_limit = timedelta(minutes=5)
+        self.is_completed = False
+        
+    def _select_questions(self):
+        """Select questions based on quiz type"""
+        if self.quiz_type == 'random':
+            return random.sample(QUIZ_QUESTIONS, min(self.num_questions, len(QUIZ_QUESTIONS)))
+        elif self.quiz_type == 'easy':
+            easy_questions = [q for q in QUIZ_QUESTIONS if q['difficulty'] == 'Easy']
+            return random.sample(easy_questions, min(self.num_questions, len(easy_questions)))
+        elif self.quiz_type == 'medium':
+            medium_questions = [q for q in QUIZ_QUESTIONS if q['difficulty'] == 'Medium']
+            return random.sample(medium_questions, min(self.num_questions, len(medium_questions)))
+        else:
+            return random.sample(QUIZ_QUESTIONS, min(self.num_questions, len(QUIZ_QUESTIONS)))
+    
+    def get_current_question(self):
+        """Get the current question"""
+        if self.current_question_index < len(self.questions):
+            return self.questions[self.current_question_index]
+        return None
+    
+    def submit_answer(self, question_id, answer):
+        """Submit an answer for a question"""
+        question = next((q for q in self.questions if q['id'] == question_id), None)
+        if question:
+            self.answers[question_id] = {
+                'selected': answer,
+                'correct': question['correct_answer'],
+                'is_correct': answer == question['correct_answer']
+            }
+            if answer == question['correct_answer']:
+                self.score += question['points']
+            return True
+        return False
+    
+    def next_question(self):
+        """Move to the next question"""
+        if self.current_question_index < len(self.questions) - 1:
+            self.current_question_index += 1
+            return True
+        return False
+    
+    def previous_question(self):
+        """Move to the previous question"""
+        if self.current_question_index > 0:
+            self.current_question_index -= 1
+            return True
+        return False
+    
+    def get_time_remaining(self):
+        """Get remaining time in seconds"""
+        elapsed = datetime.now() - self.start_time
+        remaining = self.time_limit - elapsed
+        return max(0, int(remaining.total_seconds()))
+    
+    def complete_quiz(self):
+        """Mark quiz as completed and calculate final results"""
+        self.is_completed = True
+        self.end_time = datetime.now()
+        self.time_taken = self.end_time - self.start_time
+        
+        results = {
+            'score': self.score,
+            'total_questions': len(self.questions),
+            'correct_answers': sum(1 for a in self.answers.values() if a['is_correct']),
+            'time_taken': str(self.time_taken).split('.')[0],
+            'percentage': round((self.score / (sum(q['points'] for q in self.questions))) * 100, 1),
+            'answers': self.answers,
+            'questions': self.questions
+        }
+        return results
+
+
+# Flask routes
+@app.route('/quiz')
+def quiz_home():
+    """Display quiz home page"""
+    return render_template('quiz.html')
+
+
+@app.route('/quiz/start', methods=['POST'])
+def start_quiz():
+    """Start a new quiz session"""
