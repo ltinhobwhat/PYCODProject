@@ -6,856 +6,671 @@ from flask_login import login_required, current_user
 
 quiz_bp = Blueprint("quiz", __name__)
 
-# Import questions from your existing pool
+# Expanded question pool with various cybersecurity topics
 QUESTIONS = [
+    # CIA Triad Questions
     {
-        "text": "HTTPS uses encryption to protect data in transit.",
-        "answers": ["confidentiality"]
+        "text": "Which security principle ensures that data remains unaltered during transmission?",
+        "options": ["Confidentiality", "Integrity", "Availability", "Authentication"],
+        "answer": "Integrity"
     },
     {
-        "text": "Digital signatures help ensure a message hasn't been altered.",
-        "answers": ["integrity"]
+        "text": "What does encryption primarily protect?",
+        "options": ["Availability", "Integrity", "Confidentiality", "Non-repudiation"],
+        "answer": "Confidentiality"
     },
     {
-        "text": "A redundant server ensures service stays available even during failure.",
-        "answers": ["availability"]
+        "text": "A DDoS attack primarily targets which aspect of the CIA triad?",
+        "options": ["Confidentiality", "Integrity", "Availability", "All three"],
+        "answer": "Availability"
+    },
+    
+    # Malware Questions
+    {
+        "text": "Which type of malware encrypts files and demands payment for decryption?",
+        "options": ["Trojan", "Ransomware", "Spyware", "Adware"],
+        "answer": "Ransomware"
     },
     {
-        "text": "Multi-factor authentication protects access to accounts.",
-        "answers": ["confidentiality", "integrity"]
+        "text": "What type of malware disguises itself as legitimate software?",
+        "options": ["Worm", "Virus", "Trojan", "Rootkit"],
+        "answer": "Trojan"
     },
     {
-        "text": "Firewalls help filter traffic based on rules.",
-        "answers": ["confidentiality"]
+        "text": "Which malware can replicate itself without human intervention?",
+        "options": ["Trojan", "Spyware", "Worm", "Adware"],
+        "answer": "Worm"
+    },
+    
+    # Attack Vectors
+    {
+        "text": "What is the most common initial attack vector in cyber breaches?",
+        "options": ["SQL Injection", "Phishing", "Zero-day exploits", "Physical access"],
+        "answer": "Phishing"
     },
     {
-        "text": "Phishing attacks aim to steal user credentials.",
-        "answers": ["confidentiality"]
+        "text": "Which attack involves injecting malicious code into web forms?",
+        "options": ["XSS", "DDoS", "Man-in-the-middle", "Buffer overflow"],
+        "answer": "XSS"
     },
     {
-        "text": "Hash functions create fixed-size outputs from variable input data.",
-        "answers": ["integrity"]
+        "text": "What type of attack exploits human psychology rather than technical vulnerabilities?",
+        "options": ["Zero-day", "Social engineering", "SQL injection", "Buffer overflow"],
+        "answer": "Social engineering"
+    },
+    
+    # Cryptography & Certificates
+    {
+        "text": "What does SSL/TLS primarily provide?",
+        "options": ["Antivirus protection", "Encrypted communication", "Firewall services", "Password management"],
+        "answer": "Encrypted communication"
     },
     {
-        "text": "Social engineering exploits human psychology for attacks.",
-        "answers": ["confidentiality"]
+        "text": "Which hash algorithm is considered cryptographically broken?",
+        "options": ["SHA-256", "SHA-512", "MD5", "SHA-3"],
+        "answer": "MD5"
     },
     {
-        "text": "Regular software updates help fix security vulnerabilities.",
-        "answers": ["availability", "integrity"]
+        "text": "What is the purpose of a digital certificate?",
+        "options": ["Encrypt passwords", "Verify identity", "Block malware", "Compress data"],
+        "answer": "Verify identity"
+    },
+    
+    # Network Security
+    {
+        "text": "On which OSI layer does a firewall typically operate?",
+        "options": ["Physical", "Network and Transport", "Application only", "All layers"],
+        "answer": "Network and Transport"
     },
     {
-        "text": "Strong passwords reduce the risk of unauthorized access.",
-        "answers": ["confidentiality"]
+        "text": "What port does HTTPS typically use?",
+        "options": ["80", "443", "22", "3389"],
+        "answer": "443"
+    },
+    {
+        "text": "Which protocol is more secure for remote access?",
+        "options": ["Telnet", "SSH", "FTP", "HTTP"],
+        "answer": "SSH"
+    },
+    
+    # Authentication & Access Control
+    {
+        "text": "What does two-factor authentication require?",
+        "options": ["Two passwords", "Something you know and something you have", "Two usernames", "Two devices"],
+        "answer": "Something you know and something you have"
+    },
+    {
+        "text": "Which is the most secure password policy?",
+        "options": ["8 characters minimum", "Complex passwords changed monthly", "Long passphrases", "Password + SMS code"],
+        "answer": "Long passphrases"
+    },
+    {
+        "text": "What is the principle of least privilege?",
+        "options": ["Users get minimum required access", "Admins have all access", "Everyone has same access", "Access based on seniority"],
+        "answer": "Users get minimum required access"
+    },
+    
+    # Security Best Practices
+    {
+        "text": "How often should critical security patches be applied?",
+        "options": ["Yearly", "Monthly", "As soon as possible", "Only if issues occur"],
+        "answer": "As soon as possible"
+    },
+    {
+        "text": "What is the best practice for handling suspicious emails?",
+        "options": ["Open to investigate", "Forward to colleagues", "Delete and report", "Reply asking for details"],
+        "answer": "Delete and report"
+    },
+    {
+        "text": "Which is a key principle of secure coding?",
+        "options": ["Speed over security", "Input validation", "Obscure code", "Minimal testing"],
+        "answer": "Input validation"
+    },
+    
+    # Incident Response
+    {
+        "text": "What is the first step in incident response?",
+        "options": ["Eradication", "Identification", "Recovery", "Lessons learned"],
+        "answer": "Identification"
+    },
+    {
+        "text": "What should you do if you suspect your computer is infected?",
+        "options": ["Keep working normally", "Disconnect from network", "Delete all files", "Install more antivirus"],
+        "answer": "Disconnect from network"
+    },
+    
+    # Advanced Topics
+    {
+        "text": "What is a zero-day vulnerability?",
+        "options": ["Old vulnerability", "Unknown to vendor", "Patched vulnerability", "Low-risk bug"],
+        "answer": "Unknown to vendor"
+    },
+    {
+        "text": "What does OSINT stand for?",
+        "options": ["Open Source Intelligence", "Operating System Interface", "Online Security International", "Organized Security Network"],
+        "answer": "Open Source Intelligence"
+    },
+    {
+        "text": "Which technique hides data within other data?",
+        "options": ["Encryption", "Hashing", "Steganography", "Compression"],
+        "answer": "Steganography"
+    },
+    {
+        "text": "What is a honeypot in cybersecurity?",
+        "options": ["Password manager", "Decoy system", "Firewall type", "Encryption method"],
+        "answer": "Decoy system"
+    },
+    {
+        "text": "What does APT stand for in cybersecurity?",
+        "options": ["Advanced Persistent Threat", "Application Protocol Testing", "Automated Patch Tool", "Access Point Terminal"],
+        "answer": "Advanced Persistent Threat"
+    },
+    {
+        "text": "Which attack targets the domain name system?",
+        "options": ["DNS poisoning", "IP spoofing", "MAC flooding", "Port scanning"],
+        "answer": "DNS poisoning"
+    },
+    {
+        "text": "What is the purpose of penetration testing?",
+        "options": ["Install malware", "Find vulnerabilities", "Block users", "Encrypt data"],
+        "answer": "Find vulnerabilities"
     }
 ]
 
 NUM_QUESTIONS = 10
 
-# HTML Template for quiz question - Neon City style with green theme
+# HTML Template matching the style of other mini-games
 QUIZ_QUESTION_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CIA Triad Challenge - Cyber City</title>
+    <title>Security Knowledge Quiz</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            margin: 0;
-            font-family: 'Orbitron', 'Rajdhani', 'Segoe UI', sans-serif;
-            background: #080818;
-            color: #00ff88;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #00ff00;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
+            margin: 0;
+            padding: 20px;
         }
         
-        /* Grid background */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
+        .container {
+            background-color: #2a2a2a;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            max-width: 700px;
             width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(90deg, transparent 95%, rgba(0, 255, 136, 0.1) 5%), 
-                linear-gradient(transparent 95%, rgba(0, 255, 136, 0.1) 5%);
-            background-size: 30px 30px;
-            z-index: -1;
-        }
-        
-        /* Radial glow */
-        body::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
-            z-index: -1;
-        }
-        
-        .title-section {
-            margin-bottom: 20px;
-            text-align: center;
+            border: 2px solid rgba(0, 255, 0, 0.3);
         }
         
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px #00ff88;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-        
-        .subtitle {
-            color: rgba(0, 255, 136, 0.7);
-            font-size: 1rem;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
-        
-        .quiz-container {
-            width: 90%;
-            max-width: 900px;
-            min-height: 600px;
-            position: relative;
-            border: 2px solid rgba(0, 255, 136, 0.5);
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3), inset 0 0 15px rgba(0, 255, 136, 0.1);
-            background: rgba(8, 8, 24, 0.8);
-            overflow: hidden;
-            padding: 40px;
-        }
-        
-        /* Scanner effect */
-        .scanner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.5), transparent);
-            z-index: 4;
-            animation: scan 4s linear infinite;
-            opacity: 0.7;
-        }
-        
-        @keyframes scan {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
-        
-        /* HUD corners */
-        .hud-corner {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border: 2px solid rgba(0, 255, 136, 0.7);
-            z-index: 5;
-        }
-        
-        .hud-corner-tl {
-            top: 10px;
-            left: 10px;
-            border-right: none;
-            border-bottom: none;
-        }
-        
-        .hud-corner-tr {
-            top: 10px;
-            right: 10px;
-            border-left: none;
-            border-bottom: none;
-        }
-        
-        .hud-corner-bl {
-            bottom: 10px;
-            left: 10px;
-            border-right: none;
-            border-top: none;
-        }
-        
-        .hud-corner-br {
-            bottom: 10px;
-            right: 10px;
-            border-left: none;
-            border-top: none;
-        }
-        
-        /* HUD top display */
-        .hud-top {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            font-size: 0.8rem;
-            color: rgba(0, 255, 136, 0.8);
-            z-index: 5;
-        }
-        
-        .hud-dot {
-            width: 8px;
-            height: 8px;
-            background: #00ff88;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: hudBlink 1.5s infinite;
-        }
-        
-        @keyframes hudBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .progress-section {
             text-align: center;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
             margin-bottom: 30px;
         }
         
-        .progress-label {
-            color: rgba(0, 255, 136, 0.7);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
+        .progress-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            text-align: center;
         }
         
         .progress-bar-container {
             width: 100%;
-            height: 25px;
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            border-radius: 3px;
-            position: relative;
+            height: 20px;
+            background-color: #333333;
+            border-radius: 10px;
             overflow: hidden;
+            margin: 10px 0;
         }
         
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #00ff88, rgba(0, 255, 136, 0.5));
-            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            transition: width 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #000;
             font-weight: bold;
-            color: #080818;
         }
         
         .question-block {
-            background: rgba(0, 255, 136, 0.05);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
             border-radius: 8px;
-            padding: 30px;
             margin-bottom: 30px;
-            position: relative;
         }
         
         .question-text {
             font-size: 1.3rem;
             line-height: 1.6;
             color: #00ff88;
-            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
-        .answer-option {
-            background: rgba(8, 8, 24, 0.6);
-            border: 1px solid rgba(0, 255, 136, 0.3);
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .option {
+            background: rgba(0, 255, 136, 0.05);
+            border: 2px solid rgba(0, 255, 136, 0.3);
             border-radius: 5px;
             padding: 15px 20px;
-            margin-bottom: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
         
-        .answer-option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .answer-option:hover::before {
-            left: 100%;
-        }
-        
-        .answer-option:hover {
+        .option:hover {
             background: rgba(0, 255, 136, 0.1);
             border-color: #00ff88;
+            transform: translateX(5px);
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
         
-        .answer-option label {
-            display: flex;
-            align-items: center;
+        .option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        
+        .option label {
+            display: block;
             cursor: pointer;
-            color: #00ff88;
             font-size: 1.1rem;
+            padding-left: 30px;
         }
         
-        .answer-option input[type="checkbox"] {
-            margin-right: 15px;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #00ff88;
-        }
-        
-        .control-panel {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .control-button {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.5);
-            color: #00ff88;
-            padding: 12px 24px;
-            font-size: 0.9rem;
-            cursor: pointer;
+        .option label:before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            background: transparent;
             transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 1px;
-            border-radius: 3px;
         }
         
-        .control-button:hover {
-            background: rgba(0, 255, 136, 0.2);
+        .option input[type="radio"]:checked + label:before {
+            background: #00ff88;
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
         }
         
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
+        .option input[type="radio"]:checked ~ label {
             color: #00ff88;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        }
+        
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #000000;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
             transition: all 0.3s ease;
         }
         
-        .back-link:hover {
-            text-shadow: 0 0 10px rgba(0, 255, 136, 0.8);
+        .submit-button:hover {
+            background: linear-gradient(135deg, #00cc6a, #009955);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .submit-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .timer {
+            text-align: center;
+            color: #00ff88;
+            font-size: 0.9rem;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="title-section">
-        <h1>CIA TRIAD CHALLENGE</h1>
-        <div class="subtitle">SECURITY ASSESSMENT PROTOCOL</div>
-    </div>
-    
-    <div class="quiz-container">
-        <!-- Scanner effect -->
-        <div class="scanner"></div>
+    <div class="container">
+        <h1>🧠 Security Knowledge Quiz</h1>
         
-        <!-- HUD corners -->
-        <div class="hud-corner hud-corner-tl"></div>
-        <div class="hud-corner hud-corner-tr"></div>
-        <div class="hud-corner hud-corner-bl"></div>
-        <div class="hud-corner hud-corner-br"></div>
-        
-        <!-- HUD top display -->
-        <div class="hud-top">
-            <div class="hud-dot"></div>
-            <span>SECURE CONNECTION ACTIVE • ASSESSMENT IN PROGRESS</span>
+        <div class="progress-section">
+            <div>Question {{ current }} of {{ total }}</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: {{ (current / total * 100)|int }}%">
+                    {{ (current / total * 100)|int }}%
+                </div>
+            </div>
         </div>
         
-        <form method="post">
-            <!-- Progress section -->
-            <div class="progress-section">
-                <div class="progress-label">QUESTION {{ index }} OF {{ total }}</div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" style="width: {{ (index / total * 100)|round(0, 'floor') }}%">
-                        {{ (index / total * 100)|round(0, 'floor') }}%
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Question block -->
+        <form method="POST" id="quizForm">
             <div class="question-block">
-                <div class="question-text">
-                    {{ question.text }}
-                </div>
+                <div class="question-text">{{ question.text }}</div>
                 
-                <div class="answer-option">
-                    <label>
-                        <input type="checkbox" name="answer" value="confidentiality">
-                        CONFIDENTIALITY
-                    </label>
-                </div>
-                <div class="answer-option">
-                    <label>
-                        <input type="checkbox" name="answer" value="integrity">
-                        INTEGRITY
-                    </label>
-                </div>
-                <div class="answer-option">
-                    <label>
-                        <input type="checkbox" name="answer" value="availability">
-                        AVAILABILITY
-                    </label>
+                <div class="options-container">
+                    {% for option in question.options %}
+                    <div class="option">
+                        <input type="radio" name="answer" id="option{{ loop.index }}" value="{{ option }}" required>
+                        <label for="option{{ loop.index }}">{{ option }}</label>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
             
-            <!-- Control panel -->
-            <div class="control-panel">
-                <button type="submit" class="control-button">SUBMIT ANSWER</button>
-            </div>
+            <button type="submit" class="submit-button" id="submitBtn">Submit Answer</button>
         </form>
         
-        <center>
-            <a href="{{ url_for('menu.menu') }}" class="back-link">⬅️ RETURN TO MAIN MENU</a>
-        </center>
+        <div class="timer" id="timer">Time elapsed: <span id="timeDisplay">0:00</span></div>
     </div>
     
     <script>
-        // Create random decorative dots
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.querySelector('.quiz-container');
-            for (let i = 0; i < 20; i++) {
-                const dot = document.createElement('div');
-                dot.style.position = 'absolute';
-                dot.style.width = '2px';
-                dot.style.height = '2px';
-                dot.style.backgroundColor = 'rgba(0, 255, 136, 0.3)';
-                dot.style.borderRadius = '50%';
-                dot.style.top = Math.random() * 100 + '%';
-                dot.style.left = Math.random() * 100 + '%';
-                dot.style.zIndex = '0';
-                container.appendChild(dot);
-            }
-            
-            // Add visual feedback for checkbox selection
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const option = this.closest('.answer-option');
-                    if (this.checked) {
-                        option.style.background = 'rgba(0, 255, 136, 0.2)';
-                        option.style.borderColor = '#00ff88';
-                    } else {
-                        option.style.background = 'rgba(8, 8, 24, 0.6)';
-                        option.style.borderColor = 'rgba(0, 255, 136, 0.3)';
-                    }
+        // Timer functionality
+        let startTime = {{ start_time }};
+        let timerInterval;
+        
+        function updateTimer() {
+            let elapsed = Math.floor(Date.now() / 1000 - startTime);
+            let minutes = Math.floor(elapsed / 60);
+            let seconds = elapsed % 60;
+            document.getElementById('timeDisplay').textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+        }
+        
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+        
+        // Auto-select visual feedback
+        document.querySelectorAll('.option').forEach(option => {
+            option.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                
+                // Remove selected state from all options
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.style.background = 'rgba(0, 255, 136, 0.05)';
+                    opt.style.borderColor = 'rgba(0, 255, 136, 0.3)';
                 });
+                
+                // Add selected state to clicked option
+                this.style.background = 'rgba(0, 255, 136, 0.2)';
+                this.style.borderColor = '#00ff88';
             });
+        });
+        
+        // Prevent multiple submissions
+        document.getElementById('quizForm').addEventListener('submit', function() {
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Processing...';
         });
     </script>
 </body>
 </html>
 """
 
-# HTML Template for quiz results - Neon City style with green theme
 QUIZ_RESULT_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mission Complete - CIA Triad Challenge</title>
+    <title>Quiz Results - Security Knowledge</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            margin: 0;
-            font-family: 'Orbitron', 'Rajdhani', 'Segoe UI', sans-serif;
-            background: #080818;
-            color: #00ff88;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #00ff00;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
+            margin: 0;
+            padding: 20px;
         }
         
-        /* Grid background */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
+        .container {
+            background-color: #2a2a2a;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            max-width: 600px;
             width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(90deg, transparent 95%, rgba(0, 255, 136, 0.1) 5%), 
-                linear-gradient(transparent 95%, rgba(0, 255, 136, 0.1) 5%);
-            background-size: 30px 30px;
-            z-index: -1;
-        }
-        
-        /* Radial glow */
-        body::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
-            z-index: -1;
-        }
-        
-        .title-section {
-            margin-bottom: 20px;
+            border: 2px solid rgba(0, 255, 0, 0.3);
             text-align: center;
         }
         
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px #00ff88;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-        
-        .subtitle {
-            color: rgba(0, 255, 136, 0.7);
-            font-size: 1rem;
-            margin-bottom: 20px;
-            letter-spacing: 2px;
-        }
-        
-        .results-container {
-            width: 90%;
-            max-width: 900px;
-            min-height: 500px;
-            position: relative;
-            border: 2px solid rgba(0, 255, 136, 0.5);
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3), inset 0 0 15px rgba(0, 255, 136, 0.1);
-            background: rgba(8, 8, 24, 0.8);
-            overflow: hidden;
-            padding: 40px;
-        }
-        
-        /* Scanner effect */
-        .scanner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.5), transparent);
-            z-index: 4;
-            animation: scan 4s linear infinite;
-            opacity: 0.7;
-        }
-        
-        @keyframes scan {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
-        
-        /* HUD corners */
-        .hud-corner {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            border: 2px solid rgba(0, 255, 136, 0.7);
-            z-index: 5;
-        }
-        
-        .hud-corner-tl {
-            top: 10px;
-            left: 10px;
-            border-right: none;
-            border-bottom: none;
-        }
-        
-        .hud-corner-tr {
-            top: 10px;
-            right: 10px;
-            border-left: none;
-            border-bottom: none;
-        }
-        
-        .hud-corner-bl {
-            bottom: 10px;
-            left: 10px;
-            border-right: none;
-            border-top: none;
-        }
-        
-        .hud-corner-br {
-            bottom: 10px;
-            right: 10px;
-            border-left: none;
-            border-top: none;
-        }
-        
-        /* HUD top display */
-        .hud-top {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            align-items: center;
-            font-size: 0.8rem;
-            color: rgba(0, 255, 136, 0.8);
-            z-index: 5;
-        }
-        
-        .hud-dot {
-            width: 8px;
-            height: 8px;
-            background: #00ff88;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: hudBlink 1.5s infinite;
-        }
-        
-        @keyframes hudBlink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        
-        .score-section {
-            text-align: center;
-            margin: 40px 0;
-        }
-        
-        .score-value {
-            font-size: 5rem;
-            font-weight: bold;
-            color: #00ff88;
-            text-shadow: 0 0 30px rgba(0, 255, 136, 0.8);
-            margin-bottom: 10px;
-            font-family: 'Orbitron', monospace;
-        }
-        
-        .score-details {
-            font-size: 1.2rem;
-            color: rgba(0, 255, 136, 0.8);
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
             margin-bottom: 30px;
         }
         
-        .progress-visual {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto 40px;
-        }
-        
-        .progress-bar-container {
-            width: 100%;
-            height: 40px;
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            border-radius: 3px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff88, rgba(0, 255, 136, 0.7));
-            transition: width 1.5s ease;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .score-display {
+            font-size: 4rem;
             font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+            margin: 30px 0;
+        }
+        
+        .score-details {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
             font-size: 1.1rem;
-            color: #080818;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+        
+        .detail-label {
+            color: #aaa;
+        }
+        
+        .detail-value {
+            color: #00ff88;
+            font-weight: bold;
         }
         
         .status-message {
-            text-align: center;
             padding: 20px;
             margin: 30px 0;
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-            border-radius: 5px;
+            border-radius: 8px;
+            font-size: 1.2rem;
         }
         
         .status-message.success {
             background: rgba(0, 255, 136, 0.1);
-            border-color: rgba(0, 255, 136, 0.3);
+            border: 2px solid rgba(0, 255, 136, 0.3);
             color: #00ff88;
         }
         
         .status-message.failure {
             background: rgba(255, 165, 0, 0.1);
-            border-color: rgba(255, 165, 0, 0.3);
+            border: 2px solid rgba(255, 165, 0, 0.3);
             color: #ffa500;
         }
         
-        .status-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .progress-visual {
+            width: 100%;
+            height: 40px;
+            background-color: #333333;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
         }
         
-        .control-panel {
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            transition: width 1s ease;
             display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 20px;
-            margin-top: 40px;
+            font-weight: bold;
+            color: #000;
         }
         
-        .control-button {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.5);
-            color: #00ff88;
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .action-button {
             padding: 12px 24px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 1px;
-            border-radius: 3px;
+            background: #00ff88;
+            color: #000000;
             text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
             display: inline-block;
         }
         
-        .control-button:hover {
-            background: rgba(0, 255, 136, 0.2);
-            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        .action-button:hover {
+            background: #00cc6a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .action-button.secondary {
+            background: transparent;
+            border: 2px solid #00ff88;
+            color: #00ff88;
+        }
+        
+        .action-button.secondary:hover {
+            background: rgba(0, 255, 136, 0.1);
+        }
+        
+        .achievement {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1.1rem;
         }
     </style>
 </head>
 <body>
-    <div class="title-section">
-        <h1>MISSION COMPLETE</h1>
-        <div class="subtitle">CIA TRIAD ASSESSMENT RESULTS</div>
-    </div>
-    
-    <div class="results-container">
-        <!-- Scanner effect -->
-        <div class="scanner"></div>
+    <div class="container">
+        <h1>📊 Quiz Complete!</h1>
         
-        <!-- HUD corners -->
-        <div class="hud-corner hud-corner-tl"></div>
-        <div class="hud-corner hud-corner-tr"></div>
-        <div class="hud-corner hud-corner-bl"></div>
-        <div class="hud-corner hud-corner-br"></div>
+        <div class="score-display">{{ score }}/{{ total }}</div>
         
-        <!-- HUD top display -->
-        <div class="hud-top">
-            <div class="hud-dot"></div>
-            <span>ASSESSMENT COMPLETE • RESULTS COMPILED</span>
-        </div>
-        
-        <!-- Score display -->
-        <div class="score-section">
-            <div class="score-value">{{ score }}/{{ total }}</div>
-            <div class="score-details">
-                You correctly identified {{ score }} out of {{ total }} security principles
-            </div>
-        </div>
-        
-        <!-- Progress bar -->
         <div class="progress-visual">
-            <div class="progress-bar-container">
-                <div class="progress-bar" style="width: {{ percentage }}%">
-                    {{ "%.0f"|format(percentage) }}% COMPLETE
-                </div>
+            <div class="progress-fill" style="width: {{ percentage }}%">
+                {{ percentage }}%
             </div>
         </div>
         
-        <!-- Status message -->
-        <div class="status-message {{ 'success' if completed else 'failure' }}">
-            <div class="status-title">
-                {% if completed %}
-                    CHALLENGE PASSED
-                {% else %}
-                    CHALLENGE FAILED
-                {% endif %}
+        <div class="score-details">
+            <div class="detail-row">
+                <span class="detail-label">Correct Answers:</span>
+                <span class="detail-value">{{ score }}</span>
             </div>
-            <div class="status-description">
-                {% if completed %}
-                    Excellent work, Agent! You have demonstrated strong understanding of the CIA Triad.
-                {% else %}
-                    Keep training, Agent. You need 70% or higher to pass this challenge.
-                {% endif %}
+            <div class="detail-row">
+                <span class="detail-label">Total Questions:</span>
+                <span class="detail-value">{{ total }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Time Taken:</span>
+                <span class="detail-value">{{ time_taken }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Accuracy:</span>
+                <span class="detail-value">{{ percentage }}%</span>
             </div>
         </div>
         
-        <!-- Control panel -->
-        <div class="control-panel">
-            <a href="{{ url_for('quiz.index') }}" class="control-button">RETRY MISSION</a>
-            <a href="{{ url_for('map.map_view') }}" class="control-button">RETURN TO MAP</a>
-            <a href="{{ url_for('menu.menu') }}" class="control-button">MAIN MENU</a>
+        {% if completed %}
+        <div class="status-message success">
+            ✅ Excellent work! You've demonstrated strong security knowledge.
+        </div>
+        {% if percentage == 100 %}
+        <div class="achievement">
+            🏆 Perfect Score! You're a cybersecurity expert!
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="status-message failure">
+            ❌ Keep studying! You need 70% or higher to pass. 
+        </div>
+        {% endif %}
+        
+        <div class="actions">
+            <a href="/quiz/" class="action-button secondary">Try Again</a>
+            <a href="/menu/" class="action-button">Back to Menu</a>
         </div>
     </div>
     
     <script>
-        // Animate progress bar on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const progressBar = document.querySelector('.progress-bar');
-            const finalWidth = progressBar.style.width;
-            progressBar.style.width = '0%';
-            setTimeout(() => {
-                progressBar.style.width = finalWidth;
-            }, 500);
-            
-            // Create random decorative dots
-            const container = document.querySelector('.results-container');
-            for (let i = 0; i < 20; i++) {
-                const dot = document.createElement('div');
-                dot.style.position = 'absolute';
-                dot.style.width = '2px';
-                dot.style.height = '2px';
-                dot.style.backgroundColor = 'rgba(0, 255, 136, 0.3)';
-                dot.style.borderRadius = '50%';
-                dot.style.top = Math.random() * 100 + '%';
-                dot.style.left = Math.random() * 100 + '%';
-                dot.style.zIndex = '0';
-                container.appendChild(dot);
+        // Animate score display
+        const scoreDisplay = document.querySelector('.score-display');
+        const finalScore = {{ score }};
+        let currentScore = 0;
+        
+        const animateScore = setInterval(() => {
+            if (currentScore < finalScore) {
+                currentScore++;
+                scoreDisplay.textContent = currentScore + '/{{ total }}';
+            } else {
+                clearInterval(animateScore);
             }
-        });
+        }, 50);
+        
+        // Animate progress bar
+        const progressFill = document.querySelector('.progress-fill');
+        setTimeout(() => {
+            progressFill.style.width = '{{ percentage }}%';
+        }, 100);
     </script>
 </body>
 </html>
 """
 
-def save_progress(user_id, score, completed, percentage):
+def save_progress(user_id, score, completed):
     """Save quiz progress to SQLite"""
     conn = sqlite3.connect('game.db')
     cursor = conn.cursor()
     
-    # Get current progress
-    cursor.execute('SELECT best_score, total_attempts FROM game_progress WHERE user_id = ? AND game_name = ?', 
-                   (user_id, 'quiz'))
+    # Check existing progress
+    cursor.execute('''
+        SELECT best_score, total_attempts 
+        FROM game_progress 
+        WHERE user_id = ? AND game_name = ?
+    ''', (user_id, 'quiz'))
+    
     current = cursor.fetchone()
     
     if current:
@@ -865,7 +680,7 @@ def save_progress(user_id, score, completed, percentage):
             UPDATE game_progress 
             SET is_completed = ?, best_score = ?, total_attempts = ?
             WHERE user_id = ? AND game_name = ?
-        ''', (completed, best_score, total_attempts, user_id, 'quiz'))
+        ''', (completed or current[0], best_score, total_attempts, user_id, 'quiz'))
     else:
         cursor.execute('''
             INSERT INTO game_progress (user_id, game_name, is_completed, best_score, total_attempts)
@@ -873,15 +688,12 @@ def save_progress(user_id, score, completed, percentage):
         ''', (user_id, 'quiz', completed, score))
     
     # Update user total score if completed for first time
-    if completed:
+    if completed and (not current or not current[0]):
         cursor.execute('''
             UPDATE users 
             SET total_score = total_score + ?, games_completed = games_completed + 1
-            WHERE id = ? AND id NOT IN (
-                SELECT user_id FROM game_progress 
-                WHERE user_id = ? AND game_name = ? AND is_completed = 1
-            )
-        ''', (score, user_id, user_id, 'quiz'))
+            WHERE id = ?
+        ''', (score, user_id))
     
     conn.commit()
     conn.close()
@@ -889,61 +701,136 @@ def save_progress(user_id, score, completed, percentage):
 @quiz_bp.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    if "quiz_questions" not in session or "quiz_index" not in session:
-        num_to_pick = min(NUM_QUESTIONS, len(QUESTIONS))
-        session["quiz_questions"] = random.sample(QUESTIONS, num_to_pick)
+    # Force reset if something seems wrong
+    if request.args.get('reset'):
+        session.pop('quiz_questions', None)
+        session.pop('quiz_index', None)
+        session.pop('quiz_score', None)
+        session.pop('quiz_start_time', None)
+        return redirect(url_for('quiz.index'))
+    
+    # Initialize new quiz session if needed
+    if ("quiz_questions" not in session or 
+        "quiz_index" not in session or
+        session.get("quiz_index", 0) >= NUM_QUESTIONS):
+        
+        # Clear any old data
+        session.pop('quiz_questions', None)
+        session.pop('quiz_index', None)
+        session.pop('quiz_score', None)
+        session.pop('quiz_start_time', None)
+        
+        # Start fresh
+        selected_questions = random.sample(QUESTIONS, NUM_QUESTIONS)
+        session["quiz_questions"] = selected_questions
         session["quiz_index"] = 0
         session["quiz_score"] = 0
-        session["quiz_answers"] = []
-        session["quiz_start_time"] = time.time()
+        session["quiz_start_time"] = int(time.time())
 
-    quiz_questions = session["quiz_questions"]
-    index = session.get("quiz_index", 0)
-    total = len(quiz_questions)
-
+    current_index = session.get("quiz_index", 0)
+    questions = session.get("quiz_questions", [])
+    
+    # Safety check
+    if not questions or current_index >= len(questions):
+        # Something went wrong, restart
+        session.pop('quiz_questions', None)
+        session.pop('quiz_index', None)
+        session.pop('quiz_score', None)
+        session.pop('quiz_start_time', None)
+        return redirect(url_for("quiz.index"))
+    
     if request.method == "POST":
-        user_answers = request.form.getlist("answer")
-        correct_answers = quiz_questions[index]["answers"]
-        if set(user_answers) == set(correct_answers):
-            session["quiz_score"] += 1
-        session["quiz_answers"].append(user_answers)
-        session["quiz_index"] += 1
-        index += 1
-
-        if index >= total:
-            return redirect(url_for("quiz.result"))
-
-    question = quiz_questions[index]
-    return render_template_string(QUIZ_QUESTION_TEMPLATE, 
-                         question=question, 
-                         index=index + 1, 
-                         total=total)
+        # Process answer
+        user_answer = request.form.get("answer")
+        if user_answer:  # Only process if an answer was provided
+            correct_answer = questions[current_index]["answer"]
+            
+            if user_answer == correct_answer:
+                session["quiz_score"] = session.get("quiz_score", 0) + 1
+            
+            # Move to next question
+            session["quiz_index"] = current_index + 1
+            
+            # Check if quiz is complete after answering
+            if session["quiz_index"] >= len(questions):
+                return redirect(url_for("quiz.result"))
+            
+            return redirect(url_for("quiz.index"))
+    
+    # Display current question
+    try:
+        current_question = questions[current_index]
+    except (IndexError, TypeError):
+        # Something is wrong with the data, restart
+        session.pop('quiz_questions', None)
+        session.pop('quiz_index', None)
+        session.pop('quiz_score', None)
+        session.pop('quiz_start_time', None)
+        return redirect(url_for("quiz.index"))
+    
+    return render_template_string(
+        QUIZ_QUESTION_TEMPLATE,
+        question=current_question,
+        current=current_index + 1,
+        total=len(questions),
+        start_time=session.get("quiz_start_time", int(time.time()))
+    )
 
 @quiz_bp.route("/result")
 @login_required
 def result():
+    # Safety checks
+    if ("quiz_questions" not in session or 
+        "quiz_score" not in session):
+        # No quiz data, redirect to start
+        return redirect(url_for("quiz.index"))
+    
     score = session.get("quiz_score", 0)
     total = len(session.get("quiz_questions", []))
     
-    # Calculate percentage and completion time
-    percentage = (score / total) * 100 if total > 0 else 0
-    completed = percentage >= 70  # Consider 70% as completion threshold
+    # Safety check for total
+    if total == 0:
+        return redirect(url_for("quiz.index"))
     
-    start_time = session.get("quiz_start_time", time.time())
-    completion_time = time.time() - start_time
+    # Calculate statistics
+    percentage = int((score / total * 100)) if total > 0 else 0
+    completed = percentage >= 70
+    
+    # Calculate time taken (with safety check)
+    start_time = session.get("quiz_start_time", int(time.time()))
+    current_time = int(time.time())
+    
+    # Sanity check: if time difference is more than 1 hour, something's wrong
+    if current_time - start_time > 3600:
+        time_taken = "N/A"
+    else:
+        time_taken_seconds = current_time - start_time
+        minutes = time_taken_seconds // 60
+        seconds = time_taken_seconds % 60
+        time_taken = f"{minutes}:{seconds:02d}"
     
     # Save progress
-    save_progress(current_user.id, score, completed, percentage)
+    save_progress(current_user.id, score, completed)
     
-    # Clean up session
+    # Clear session
     session.pop('quiz_questions', None)
     session.pop('quiz_index', None)
     session.pop('quiz_score', None)
-    session.pop('quiz_answers', None)
     session.pop('quiz_start_time', None)
     
-    return render_template_string(QUIZ_RESULT_TEMPLATE, 
-                         score=score, 
-                         total=total,
-                         percentage=percentage,
-                         completed=completed)
+    return render_template_string(
+        QUIZ_RESULT_TEMPLATE,
+        score=score,
+        total=total,
+        percentage=percentage,
+        completed=completed,
+        time_taken=time_taken
+    )
+@quiz_bp.route("/clear")
+@login_required
+def clear_session():
+    session.pop('quiz_questions', None)
+    session.pop('quiz_index', None)
+    session.pop('quiz_score', None)
+    session.pop('quiz_start_time', None)
+    return redirect(url_for('quiz.index'))

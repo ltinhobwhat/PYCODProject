@@ -88,7 +88,14 @@ def create_app():
         print("✅ Fixed SQL injector loaded")
     except Exception as e:
         print(f"❌ SQL injector failed: {e}")
-    
+    # Add this to your __init__.py file after the SQL injector blueprint registration:
+
+    try:
+        from .social_engineering import social_bp
+        app.register_blueprint(social_bp, url_prefix='/social')
+        print("✅ Social Engineering loaded")
+    except Exception as e:
+        print(f"❌ Social Engineering failed: {e}")
     # Optional: Leaderboard (will create this next if needed)
     try:
         from .leaderboard import leaderboard_bp

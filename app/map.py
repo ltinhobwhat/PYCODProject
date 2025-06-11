@@ -171,6 +171,22 @@ def map_page():
                         🚀 Defend
                     </a>
                 </div>
+                # Add this to your map.py file in the challenges-grid section, after the SQL Defense Challenge:
+
+                <!-- Social Engineering Challenge -->
+                <div class="challenge-card">
+                    <div class="challenge-icon">🎭</div>
+                    <div class="challenge-title">Social Engineering</div>
+                    <div class="difficulty difficulty-advanced">Advanced</div>
+                    <div class="challenge-description">
+                        Test your awareness against social engineering tactics and see if you remember your passwords!
+                        <br><br>
+                        <strong style="color: #ff4545;">⚠️ Requires completion of all other challenges!</strong>
+                    </div>
+                    <a href="/social" class="challenge-button">
+                        🚀 Test Awareness
+                    </a>
+                </div>
             </div>
         </div>
         
