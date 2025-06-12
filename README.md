@@ -30,7 +30,7 @@ To run CyberSec Academy locally, follow these steps:
 
 ```bash
 git clone https://github.com/yourusername/cybersec-academy.git
-cd cybersec-academy
+cd PYCODProject
 ```
 
 ### 2. Create a virtual environment (optional but recommended)
