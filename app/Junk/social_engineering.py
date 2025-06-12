@@ -687,7 +687,7 @@ RESULTS_TEMPLATE = """
 """
 
 def check_all_games_completed(user_id):
-    """Check if user meets the requirements for social engineering challenge"""
+    """Check if user has scored at least 1 point in all other games"""
     conn = sqlite3.connect('game.db')
     cursor = conn.cursor()
     
@@ -712,86 +712,19 @@ def check_all_games_completed(user_id):
             'sqlinjector': 'SQL Injection'
         }
         
-        # Different requirements for each game
-        if game == 'quiz':
-            # Quiz: need 7/10 or more
-            if result and result[1] >= 7:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 7/10, have {result[1] if result else 0}/10)'
-                }
-                all_completed = False
-                
-        elif game == 'vigenere':
-            # Vigenere: need 3 points
-            if result and result[1] >= 3:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 3 points, have {result[1] if result else 0})'
-                }
-                all_completed = False
-                
-        elif game == 'hashgame':
-            # Hash game: need 3 points
-            if result and result[1] >= 3:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 3 points, have {result[1] if result else 0})'
-                }
-                all_completed = False
-                
-        elif game == 'sqlinjector':
-            # SQL Injector: need 3 levels (which equals 22 points: 5+7+10)
-            if result and result[1] >= 22:  # Sum of first 3 levels
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 3 levels/22 points, have {result[1] if result else 0})'
-                }
-                all_completed = False
-                
-        else:  # Password game
-            # Password: just need any score > 0
-            if result and result[0] and result[1] > 0:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': 0,
-                    'name': game_names[game]
-                }
-                all_completed = False
+        if result and result[0] and result[1] > 0:  # completed and score > 0
+            game_status[game] = {
+                'completed': True,
+                'score': result[1],
+                'name': game_names[game]
+            }
+        else:
+            game_status[game] = {
+                'completed': False,
+                'score': 0,
+                'name': game_names[game]
+            }
+            all_completed = False
     
     conn.close()
     return all_completed, game_status

@@ -614,3 +614,7 @@ def reset_levels():
     session.pop("sql_score", None)
     session.pop("sql_start_time", None)
     return redirect(url_for('sqlinjector.index'))
+@sqlinjector_bp.route("/defender")
+@login_required
+def defender_redirect():
+    return redirect(url_for('sqldefender.index'))

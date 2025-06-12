@@ -103,5 +103,10 @@ def create_app():
         print("✅ Leaderboard blueprint loaded")
     except Exception as e:
         print(f"❌ Leaderboard blueprint failed: {e}")
-    
+    try:
+        from .sql_defender import sqldefender_bp
+        app.register_blueprint(sqldefender_bp, url_prefix='/sqldefender')
+        print("✅ SQL Defender loaded")
+    except Exception as e:
+        print(f"❌ SQL Defender failed: {e}")
     return app

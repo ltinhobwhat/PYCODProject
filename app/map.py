@@ -145,7 +145,7 @@ def map_page():
                         🚀 Investigate
                     </a>
                 </div>
-                
+
                 <!-- SQL Injection Challenge -->
                 <div class="challenge-card">
                     <div class="challenge-icon">💀</div>
@@ -167,12 +167,11 @@ def map_page():
                     <div class="challenge-description">
                         Learn how to defend against SQL injection attacks using secure coding practices and parameterized queries.
                     </div>
-                    <a href="/sqlinjector/defender" class="challenge-button">
+                    <a href="/sqldefender" class="challenge-button">
                         🚀 Defend
                     </a>
                 </div>
-                # Add this to your map.py file in the challenges-grid section, after the SQL Defense Challenge:
-
+                
                 <!-- Social Engineering Challenge -->
                 <div class="challenge-card">
                     <div class="challenge-icon">🎭</div>
