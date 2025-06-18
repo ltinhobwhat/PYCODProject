@@ -39,17 +39,37 @@ def map_page():
                 padding: 2rem; 
                 border-radius: 15px; 
                 border: 2px solid rgba(0,255,136,0.3);
-                text-align: center;
                 transition: all 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
             }
             .challenge-card:hover { 
                 transform: translateY(-10px); 
                 border-color: #00ff88;
                 box-shadow: 0 20px 40px rgba(0,255,136,0.3);
             }
-            .challenge-icon { font-size: 3rem; margin-bottom: 1rem; }
-            .challenge-title { color: #00ff88; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; }
-            .challenge-description { margin-bottom: 1.5rem; line-height: 1.6; opacity: 0.9; }
+            .challenge-icon { 
+                font-size: 3rem; 
+                margin-bottom: 1rem; 
+            }
+            .challenge-title { 
+                color: #00ff88; 
+                font-size: 1.5rem; 
+                font-weight: bold; 
+                margin-bottom: 1rem; 
+                text-align: center;
+            }
+            .challenge-description { 
+                margin-bottom: 1.5rem; 
+                line-height: 1.6; 
+                opacity: 0.9; 
+                text-align: center;
+                flex-grow: 1;
+                display: flex;
+                align-items: center;
+            }
             .difficulty { 
                 padding: 0.3rem 0.8rem; 
                 border-radius: 15px; 
@@ -62,7 +82,7 @@ def map_page():
             .difficulty-intermediate { background: rgba(255,165,0,0.3); color: #ffa500; }
             .difficulty-advanced { background: rgba(255,69,69,0.3); color: #ff4545; }
             .challenge-button { 
-                width: 100%; 
+                width: calc(100% - 2rem);
                 padding: 1rem; 
                 background: linear-gradient(135deg, #00ff88, #00cc6a);
                 color: #000000; 
@@ -72,8 +92,13 @@ def map_page():
                 font-size: 1.1rem; 
                 cursor: pointer; 
                 text-decoration: none; 
-                display: block;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 transition: all 0.3s ease;
+                margin: 0 auto;
+                position: relative;
+                bottom: 0;
             }
             .challenge-button:hover { 
                 background: linear-gradient(135deg, #00cc6a, #009955);
@@ -178,9 +203,9 @@ def map_page():
                     <div class="challenge-title">Social Engineering</div>
                     <div class="difficulty difficulty-advanced">Advanced</div>
                     <div class="challenge-description">
-                        Test your awareness against social engineering tactics and see if you remember your passwords!
+                        <div>Test your awareness against social engineering tactics and see if you remember your passwords!
                         <br><br>
-                        <strong style="color: #ff4545;">⚠️ Requires completion of all other challenges!</strong>
+                        <strong style="color: #ff4545;">⚠️ Requires completion of all other challenges!</strong></div>
                     </div>
                     <a href="/social" class="challenge-button">
                         🚀 Test Awareness

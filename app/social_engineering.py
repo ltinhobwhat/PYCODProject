@@ -160,6 +160,20 @@ MAIN_TEMPLATE = """
             font-size: 1.2rem;
         }
         
+        .scoring-info {
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+        
+        .scoring-info h4 {
+            color: #ffa500;
+            margin-top: 0;
+        }
+        
         .start-button {
             display: block;
             width: 100%;
@@ -242,6 +256,15 @@ MAIN_TEMPLATE = """
             <p style="text-align: center; color: #00ff88; font-weight: bold;">
                 Warning: This challenge will test your memory of the passwords you created earlier.
             </p>
+        </div>
+        
+        <div class="scoring-info">
+            <h4>📊 Scoring System:</h4>
+            <ul style="margin: 5px 0; padding-left: 20px;">
+                <li><strong style="color: #00ff88;">Correct password:</strong> +10 points</li>
+                <li><strong style="color: #ff4545;">Forgotten password:</strong> -20 points</li>
+                <li>Remember all 3 passwords for the best score!</li>
+            </ul>
         </div>
         
         <form method="POST">
@@ -609,6 +632,32 @@ RESULTS_TEMPLATE = """
             color: #aaa;
         }
         
+        .score-details {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .score-details h3 {
+            color: #00ff88;
+            margin-top: 0;
+        }
+        
+        .score-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .positive {
+            color: #00ff88;
+        }
+        
+        .negative {
+            color: #ff4545;
+        }
+        
         .lesson-learned {
             background: rgba(255, 165, 0, 0.1);
             border: 1px solid rgba(255, 165, 0, 0.3);
@@ -658,13 +707,30 @@ RESULTS_TEMPLATE = """
             <span>{% if results[2] %}✅ Correct{% else %}❌ Incorrect{% endif %}</span>
         </div>
         
+        <div class="score-details">
+            <h3>Score Breakdown:</h3>
+            <div class="score-line">
+                <span>Correct passwords ({{ correct_count }} × 10):</span>
+                <span class="positive">+{{ correct_count * 10 }}</span>
+            </div>
+            <div class="score-line">
+                <span>Forgotten passwords ({{ 3 - correct_count }} × 20):</span>
+                <span class="negative">-{{ (3 - correct_count) * 20 }}</span>
+            </div>
+            <hr style="border-color: #444; margin: 10px 0;">
+            <div class="score-line" style="font-weight: bold;">
+                <span>Total points earned:</span>
+                <span class="{% if score_change >= 0 %}positive{% else %}negative{% endif %}">
+                    {% if score_change >= 0 %}+{% endif %}{{ score_change }}
+                </span>
+            </div>
+        </div>
+        
         <div class="score-summary">
-            <div class="score-value">{{ final_score }}</div>
-            <div>Final Score</div>
+            <div class="score-value">{{ score_change }}</div>
+            <div>Points Earned</div>
             <div class="score-breakdown">
-                Original score: {{ original_score }} | 
-                Multiplier: {{ multiplier }}x | 
-                Correct: {{ correct_count }}/3
+                Remembered: {{ correct_count }}/3 passwords
             </div>
         </div>
         
@@ -712,86 +778,20 @@ def check_all_games_completed(user_id):
             'sqlinjector': 'SQL Injection'
         }
         
-        # Different requirements for each game
-        if game == 'quiz':
-            # Quiz: need 7/10 or more
-            if result and result[1] >= 7:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 7/10, have {result[1] if result else 0}/10)'
-                }
-                all_completed = False
-                
-        elif game == 'vigenere':
-            # Vigenere: need 3 points
-            if result and result[1] >= 3:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 3 points, have {result[1] if result else 0})'
-                }
-                all_completed = False
-                
-        elif game == 'hashgame':
-            # Hash game: need 3 points
-            if result and result[1] >= 3:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 3 points, have {result[1] if result else 0})'
-                }
-                all_completed = False
-                
-        elif game == 'sqlinjector':
-            # SQL Injector: need 3 levels (which equals 22 points: 5+7+10)
-            if result and result[1] >= 22:  # Sum of first 3 levels
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': result[1] if result else 0,
-                    'name': game_names[game] + f' (need 3 levels/22 points, have {result[1] if result else 0})'
-                }
-                all_completed = False
-                
-        else:  # Password game
-            # Password: just need any score > 0
-            if result and result[0] and result[1] > 0:
-                game_status[game] = {
-                    'completed': True,
-                    'score': result[1],
-                    'name': game_names[game]
-                }
-            else:
-                game_status[game] = {
-                    'completed': False,
-                    'score': 0,
-                    'name': game_names[game]
-                }
-                all_completed = False
+        # For simplicity, just check if they have any score
+        if result and result[0] and result[1] > 0:
+            game_status[game] = {
+                'completed': True,
+                'score': result[1],
+                'name': game_names[game]
+            }
+        else:
+            game_status[game] = {
+                'completed': False,
+                'score': 0,
+                'name': game_names[game]
+            }
+            all_completed = False
     
     conn.close()
     return all_completed, game_status
@@ -801,53 +801,90 @@ def get_user_password_hashes(user_id):
     conn = sqlite3.connect('game.db')
     cursor = conn.cursor()
     
-    # Get the 3 most recent password hashes for this user
+    # Try the new table first
     cursor.execute('''
         SELECT password_hash 
-        FROM user_passwords 
+        FROM pswd_hashes 
         WHERE user_id = ? 
-        ORDER BY id DESC 
+        ORDER BY password_number
         LIMIT 3
     ''', (user_id,))
     
     results = cursor.fetchall()
+    
+    # If not found in new table, try the old table
+    if not results:
+        cursor.execute('''
+            SELECT password_hash 
+            FROM user_passwords 
+            WHERE user_id = ? 
+            ORDER BY id DESC 
+            LIMIT 3
+        ''', (user_id,))
+        
+        results = cursor.fetchall()
+        # Reverse to get original order for old table
+        if results:
+            results = list(reversed(results))
+    
     conn.close()
     
-    # Reverse to get original order (1st, 2nd, 3rd)
     if results:
-        return [r[0] for r in reversed(results)]
+        return [r[0] for r in results]
     return []
 
-def update_user_score_with_multiplier(user_id, multiplier):
-    """Update user's total score with multiplier"""
+def save_social_progress(user_id, score_change):
+    """Save social engineering game progress"""
     conn = sqlite3.connect('game.db')
     cursor = conn.cursor()
     
     try:
-        # Get current total score
-        cursor.execute('SELECT total_score FROM users WHERE id = ?', (user_id,))
-        current_score = cursor.fetchone()[0] or 0
-        
-        # Calculate new score
-        new_score = int(current_score * multiplier)
-        
-        # Update score
-        cursor.execute('UPDATE users SET total_score = ? WHERE id = ?', (new_score, user_id))
-        
-        # Mark social engineering as completed
+        # Update user's total score
         cursor.execute('''
-            INSERT OR REPLACE INTO game_progress 
-            (user_id, game_name, is_completed, best_score, total_attempts)
-            VALUES (?, 'social', 1, ?, 1)
-        ''', (user_id, new_score - current_score))
+            UPDATE users 
+            SET total_score = total_score + ?
+            WHERE id = ?
+        ''', (score_change, user_id))
+        
+        # Check if social engineering game already exists
+        cursor.execute('''
+            SELECT id, is_completed, best_score 
+            FROM game_progress 
+            WHERE user_id = ? AND game_name = 'social'
+        ''', (user_id,))
+        
+        existing = cursor.fetchone()
+        
+        if existing:
+            # Update existing record
+            new_best = max(existing[2], score_change)
+            cursor.execute('''
+                UPDATE game_progress 
+                SET is_completed = 1, 
+                    best_score = ?, 
+                    total_attempts = total_attempts + 1
+                WHERE user_id = ? AND game_name = 'social'
+            ''', (new_best, user_id))
+        else:
+            # Insert new record
+            cursor.execute('''
+                INSERT INTO game_progress 
+                (user_id, game_name, is_completed, best_score, total_attempts)
+                VALUES (?, 'social', 1, ?, 1)
+            ''', (user_id, score_change))
+            
+            # Update games completed
+            cursor.execute('''
+                UPDATE users 
+                SET games_completed = games_completed + 1
+                WHERE id = ?
+            ''', (user_id,))
         
         conn.commit()
-        return current_score, new_score
         
     except Exception as e:
-        print(f"Error updating score: {e}")
+        print(f"[ERROR] Error saving social progress: {e}")
         conn.rollback()
-        return 0, 0
     finally:
         conn.close()
 
@@ -898,7 +935,7 @@ def password_test():
         original_hashes = get_user_password_hashes(current_user.id)
         
         if not original_hashes:
-            flash("Error: Could not retrieve your original passwords.", "error")
+            flash("Error: Could not retrieve your original passwords. Please complete the Password Security challenge first.", "error")
             return redirect('/social/')
         
         # Check each password
@@ -913,26 +950,17 @@ def password_test():
             else:
                 results.append(False)
         
-        # Calculate multiplier based on correct passwords
-        if correct_count == 3:
-            multiplier = 1.5  # All correct: 50% bonus
-        elif correct_count == 2:
-            multiplier = 1.3  # Two correct: 30% bonus
-        elif correct_count == 1:
-            multiplier = 1.1  # One correct: 10% bonus
-        else:
-            multiplier = 0.7  # None correct: 30% penalty
+        # Calculate score change
+        score_change = (correct_count * 10) - ((3 - correct_count) * 20)
         
-        # Update user score
-        original_score, new_score = update_user_score_with_multiplier(current_user.id, multiplier)
+        # Save progress
+        save_social_progress(current_user.id, score_change)
         
         # Store results in session
         session['social_results'] = {
             'results': results,
             'correct_count': correct_count,
-            'multiplier': multiplier,
-            'original_score': original_score,
-            'final_score': new_score
+            'score_change': score_change
         }
         
         # Clear message index
@@ -956,6 +984,4 @@ def results():
     return render_template_string(RESULTS_TEMPLATE,
                                 results=results_data['results'],
                                 correct_count=results_data['correct_count'],
-                                multiplier=results_data['multiplier'],
-                                original_score=results_data['original_score'],
-                                final_score=results_data['final_score'])
+                                score_change=results_data['score_change'])

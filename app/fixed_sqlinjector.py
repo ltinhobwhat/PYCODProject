@@ -6,13 +6,13 @@ from flask_login import login_required, current_user
 
 sqlinjector_bp = Blueprint('sqlinjector', __name__)
 
-# Enhanced levels with better progression
+# Enhanced levels with better progression and clearer hints
 LEVELS = [
     {
         "id": 1,
         "title": "Basic Authentication Bypass",
         "description": "The login form has no protection. Try a classic SQL injection.",
-        "hint": "What if you could make the WHERE clause always true? Think about OR conditions...",
+        "hint": "Try typing exactly this in the username field: admin' OR '1'='1' -- (the spaces and quotes are important!)",
         "solution_hints": ["' OR '1'='1", "' OR 1=1--", "admin' --"],
         "points": 5,
         "difficulty": "Beginner"
@@ -21,7 +21,7 @@ LEVELS = [
         "id": 2,
         "title": "Comment Attack",
         "description": "The system filters some characters but forgot about SQL comments.",
-        "hint": "SQL comments can terminate the rest of a query. Try -- or #",
+        "hint": "Type this in username: admin'-- (this makes everything after it a comment). The -- tells SQL to ignore the password check!",
         "solution_hints": ["admin'--", "admin' --", "' OR 1=1--"],
         "points": 7,
         "difficulty": "Intermediate"
@@ -30,7 +30,7 @@ LEVELS = [
         "id": 3,
         "title": "Password Field Injection",
         "description": "The username field is protected, but what about the password?",
-        "hint": "Sometimes developers only protect one field. Try injecting in the password field.",
+        "hint": "Use a normal username like 'admin' or 'user', then in the PASSWORD field type: ' OR '1'='1",
         "solution_hints": ["' OR '1'='1", "' OR 1=1--", "anything' OR 'x'='x"],
         "points": 10,
         "difficulty": "Intermediate"
@@ -39,7 +39,7 @@ LEVELS = [
         "id": 4,
         "title": "Union-Based Attack",
         "description": "Can you extract data from other tables?",
-        "hint": "UNION SELECT allows you to combine results. Try to match the column count.",
+        "hint": "Try this in either field: ' UNION SELECT null,null,null-- (you might need to adjust the number of nulls)",
         "solution_hints": ["' UNION SELECT", "' UNION SELECT null", "' UNION SELECT 1,2,3--"],
         "points": 15,
         "difficulty": "Advanced"
@@ -48,7 +48,7 @@ LEVELS = [
         "id": 5,
         "title": "Blind Injection",
         "description": "No error messages shown. Use time-based or boolean-based injection.",
-        "hint": "Try conditions that cause delays or different responses: ' AND SLEEP(5)--",
+        "hint": "Try: admin' AND 1=1-- (should work) or admin' AND SLEEP(5)-- (causes a delay if vulnerable)",
         "solution_hints": ["' AND 1=1--", "' AND SLEEP", "' OR IF("],
         "points": 20,
         "difficulty": "Expert"
@@ -165,6 +165,11 @@ SQL_INJECTION_TEMPLATE = """
             border: 1px solid #00ff00;
             padding: 30px;
             margin: 20px 0;
+        }
+        
+        .login-form.disabled {
+            opacity: 0.5;
+            pointer-events: none;
         }
         
         .form-group {
@@ -358,20 +363,20 @@ SQL_INJECTION_TEMPLATE = """
             <p>{{ level_data.description }}</p>
         </div>
         
-        <div class="login-form">
+        <div class="login-form {% if just_completed %}disabled{% endif %}" id="loginForm">
             <h3>Vulnerable Login Form</h3>
-            <form method="POST" id="loginForm">
+            <form method="POST" id="loginFormElement">
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" id="username" name="username" autocomplete="off" 
-                           placeholder="Enter username or injection">
+                           placeholder="Enter username or injection" {% if just_completed %}disabled{% endif %}>
                 </div>
                 <div class="form-group">
                     <label for="password">Password:</label>
                     <input type="password" id="password" name="password" autocomplete="off"
-                           placeholder="Enter password or injection">
+                           placeholder="Enter password or injection" {% if just_completed %}disabled{% endif %}>
                 </div>
-                <button type="submit" class="button">Execute Query</button>
+                <button type="submit" class="button" {% if just_completed %}disabled{% endif %}>Execute Query</button>
                 <button type="button" class="button" onclick="toggleHint()">Show Hint</button>
             </form>
         </div>
@@ -388,9 +393,7 @@ SQL_INJECTION_TEMPLATE = """
         <div class="result {{ 'success' if success else 'failure' }}">
             {{ result }}
             {% if success and not completed %}
-            <form method="POST" action="{{ url_for('sqlinjector.next_level') }}" style="margin-top: 15px;">
-                <button type="submit" class="button">Continue to Next Level →</button>
-            </form>
+            <p style="margin-top: 15px;">⏳ Moving to next level in 3 seconds...</p>
             {% elif completed %}
             <div style="margin-top: 20px;">
                 <p>🏆 Congratulations! You've mastered all SQL injection levels!</p>
@@ -427,7 +430,9 @@ SQL_INJECTION_TEMPLATE = """
         }
         
         // Auto-focus on username field
+        {% if not just_completed %}
         document.getElementById('username').focus();
+        {% endif %}
         
         // Add typing effect to SQL display
         {% if query %}
@@ -443,6 +448,13 @@ SQL_INJECTION_TEMPLATE = """
             }
         }
         typeWriter();
+        {% endif %}
+        
+        // Auto-redirect after success
+        {% if success and not completed %}
+        setTimeout(function() {
+            window.location.href = "{{ url_for('sqlinjector.next_level') }}";
+        }, 3000);
         {% endif %}
     </script>
 </body>
@@ -537,6 +549,7 @@ def index():
         session["sql_attempts"] = 0
         session["sql_score"] = 0
         session["sql_start_time"] = time.time()
+        session["sql_level_completed"] = []
     
     current_level = session.get("sql_level", 1)
     
@@ -550,10 +563,17 @@ def index():
     result = None
     success = False
     completed = False
+    just_completed = False
     
     if request.method == "POST":
         username = request.form.get("username", "")
         password = request.form.get("password", "")
+        
+        # Check if this level was already completed (prevent double points)
+        level_completed_set = set(session.get("sql_level_completed", []))
+        if current_level in level_completed_set:
+            # Level already completed, redirect to next
+            return redirect(url_for('sqlinjector.next_level'))
         
         # Escape HTML to prevent display issues
         safe_username = html.escape(username)
@@ -568,8 +588,13 @@ def index():
         success = check_injection(username, password, current_level)
         
         if success:
+            # Mark level as completed to prevent re-submission
+            level_completed_set.add(current_level)
+            session["sql_level_completed"] = list(level_completed_set)
+            
             session["sql_score"] += level_data["points"]
             result = f"✅ Injection successful! You earned {level_data['points']} points!"
+            just_completed = True
             
             # Check if all levels completed
             if current_level >= len(LEVELS):
@@ -592,13 +617,14 @@ def index():
         result=result,
         success=success,
         completed=completed,
+        just_completed=just_completed,
         attempts=session.get("sql_attempts", 0),
         score=session.get("sql_score", 0),
         total_score=session.get("sql_score", 0),
         time_elapsed=time_elapsed
     )
 
-@sqlinjector_bp.route("/next_level", methods=["POST"])
+@sqlinjector_bp.route("/next_level", methods=["GET", "POST"])
 @login_required
 def next_level():
     current_level = session.get("sql_level", 1)
@@ -613,7 +639,9 @@ def reset_levels():
     session.pop("sql_attempts", None)
     session.pop("sql_score", None)
     session.pop("sql_start_time", None)
+    session.pop("sql_level_completed", None)
     return redirect(url_for('sqlinjector.index'))
+
 @sqlinjector_bp.route("/defender")
 @login_required
 def defender_redirect():
