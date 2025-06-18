@@ -15,14 +15,17 @@ HASH_ALGOS = {
 }
 
 def save_progress(user_id, score, completed):
-    """Save progress to SQLite"""
+    """Save progress to SQLite - FIXED VERSION"""
     conn = sqlite3.connect('game.db')
     cursor = conn.cursor()
     
     # Get current progress
-    cursor.execute('SELECT best_score, total_attempts FROM game_progress WHERE user_id = ? AND game_name = ?', 
+    cursor.execute('SELECT best_score, total_attempts, is_completed FROM game_progress WHERE user_id = ? AND game_name = ?', 
                    (user_id, 'hashgame'))
     current = cursor.fetchone()
+    
+    # FIXED: Check if this is first time completion BEFORE updating
+    is_first_completion = completed and (not current or not current[2])  # current[2] is is_completed
     
     if current:
         best_score = max(current[0], score)
@@ -38,16 +41,14 @@ def save_progress(user_id, score, completed):
             VALUES (?, ?, ?, ?, 1)
         ''', (user_id, 'hashgame', completed, score))
     
-    # Update user total score if completed for first time
-    if completed:
+    # FIXED: Update user total score if completed for first time
+    if is_first_completion:
         cursor.execute('''
             UPDATE users 
             SET total_score = total_score + ?, games_completed = games_completed + 1
-            WHERE id = ? AND id NOT IN (
-                SELECT user_id FROM game_progress 
-                WHERE user_id = ? AND game_name = ? AND is_completed = 1
-            )
-        ''', (score, user_id, user_id, 'hashgame'))
+            WHERE id = ?
+        ''', (score, user_id))
+        print(f"First completion for user {user_id}: added {score} points")
     
     conn.commit()
     conn.close()
