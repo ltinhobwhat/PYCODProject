@@ -1,4 +1,4 @@
-# app/auth.py (Emergency Fix)
+# app/auth.py - Version complète avec gestion des sessions
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, logout_user, login_required
 import sqlite3
@@ -22,10 +22,17 @@ def login():
         conn.close()
         
         if user_data:
+            # IMPORTANT: Clear ALL session data before login to prevent data leakage
+            session.clear()
+            
             from .simple_user import SimpleUser
             user = SimpleUser(user_data)
             login_user(user)
-            # DIREKT zum Success-Page ohne Menu
+            
+            # Store user ID in session for game session management
+            session['current_user_id'] = user.id
+            
+            # Redirect to success page
             return redirect(url_for('auth.success'))
         else:
             flash('Invalid username or password')
@@ -53,7 +60,7 @@ def success():
         <div class="success-box">
             <h1>🎉 Welcome {current_user.username}!</h1>
             <p>Your CyberSec Academy account is now active.</p>
-            <p>Score: {current_user.total_score} points | Games: {current_user.games_completed}/6</p>
+            <p>Score: {current_user.total_score} points | Games: {current_user.games_completed}/7</p>
             
             <div style="margin: 2rem 0;">
                 <a href="/menu">🏠 Main Menu</a>
@@ -95,11 +102,16 @@ def signup():
             user_data = cursor.fetchone()
             conn.close()
             
+            # Clear session before new login
+            session.clear()
+            
             from .simple_user import SimpleUser
             user = SimpleUser(user_data)
             login_user(user)
             
-            # DIREKT zum Success-Page
+            # Store user ID in session
+            session['current_user_id'] = user.id
+            
             return redirect(url_for('auth.success'))
             
         except Exception as e:
@@ -113,5 +125,7 @@ def signup():
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    # Clear ALL session data to prevent any data leakage
+    session.clear()
     logout_user()
     return redirect(url_for('auth.login'))

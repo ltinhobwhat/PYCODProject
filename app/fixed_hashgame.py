@@ -15,42 +15,78 @@ HASH_ALGOS = {
 }
 
 def save_progress(user_id, score, completed):
-    """Save progress to SQLite"""
+    """Save progress to SQLite - FIXED VERSION"""
     conn = sqlite3.connect('game.db')
     cursor = conn.cursor()
     
-    # Get current progress
-    cursor.execute('SELECT best_score, total_attempts FROM game_progress WHERE user_id = ? AND game_name = ?', 
-                   (user_id, 'hashgame'))
-    current = cursor.fetchone()
-    
-    if current:
-        best_score = max(current[0], score)
-        total_attempts = current[1] + 1
+    try:
+        print(f"[DEBUG] Saving hashgame progress: user={user_id}, score={score}, completed={completed}")
+        
+        # Get current progress
         cursor.execute('''
-            UPDATE game_progress 
-            SET is_completed = ?, best_score = ?, total_attempts = ?
+            SELECT id, is_completed, best_score, total_attempts 
+            FROM game_progress 
             WHERE user_id = ? AND game_name = ?
-        ''', (completed, best_score, total_attempts, user_id, 'hashgame'))
-    else:
-        cursor.execute('''
-            INSERT INTO game_progress (user_id, game_name, is_completed, best_score, total_attempts)
-            VALUES (?, ?, ?, ?, 1)
-        ''', (user_id, 'hashgame', completed, score))
-    
-    # Update user total score if completed for first time
-    if completed:
-        cursor.execute('''
-            UPDATE users 
-            SET total_score = total_score + ?, games_completed = games_completed + 1
-            WHERE id = ? AND id NOT IN (
-                SELECT user_id FROM game_progress 
-                WHERE user_id = ? AND game_name = ? AND is_completed = 1
-            )
-        ''', (score, user_id, user_id, 'hashgame'))
-    
-    conn.commit()
-    conn.close()
+        ''', (user_id, 'hashgame'))
+        
+        existing = cursor.fetchone()
+        
+        if existing:
+            record_id, was_completed, old_score, attempts = existing
+            new_score = max(old_score, score)
+            
+            # Update existing record
+            cursor.execute('''
+                UPDATE game_progress 
+                SET is_completed = ?, best_score = ?, total_attempts = ?
+                WHERE id = ?
+            ''', (completed or was_completed, new_score, attempts + 1, record_id))
+            
+            # Update user total score if improved
+            if new_score > old_score:
+                score_diff = new_score - old_score
+                cursor.execute('''
+                    UPDATE users 
+                    SET total_score = total_score + ?
+                    WHERE id = ?
+                ''', (score_diff, user_id))
+                
+            # Update games completed if newly completed
+            if completed and not was_completed:
+                cursor.execute('''
+                    UPDATE users 
+                    SET games_completed = games_completed + 1
+                    WHERE id = ?
+                ''', (user_id,))
+        else:
+            # First time playing
+            cursor.execute('''
+                INSERT INTO game_progress (user_id, game_name, is_completed, best_score, total_attempts)
+                VALUES (?, 'hashgame', ?, ?, 1)
+            ''', (user_id, completed, score))
+            
+            # Update user stats
+            cursor.execute('''
+                UPDATE users 
+                SET total_score = total_score + ?
+                WHERE id = ?
+            ''', (score, user_id))
+            
+            if completed:
+                cursor.execute('''
+                    UPDATE users 
+                    SET games_completed = games_completed + 1
+                    WHERE id = ?
+                ''', (user_id,))
+        
+        conn.commit()
+        print(f"[DEBUG] Hashgame save successful!")
+        
+    except Exception as e:
+        print(f"[ERROR] Error saving hashgame progress: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
 
 def generate_hash_challenge():
     word = random.choice(WORDS)

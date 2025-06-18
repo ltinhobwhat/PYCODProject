@@ -118,3 +118,86 @@ def reset_score():
     session.pop("vigenere_total", None)
     session.pop("vigenere_start_time", None)
     return redirect(url_for('vigenere.index'))
+# Add this function to each mini-game file that's not saving scores properly
+
+def save_progress(user_id, score, completed):
+    """Save progress to SQLite - FIXED VERSION"""
+    conn = sqlite3.connect('game.db')
+    cursor = conn.cursor()
+    
+    try:
+        print(f"[DEBUG] Saving vigenere progress: user={user_id}, score={score}, completed={completed}")
+        
+        # Get current progress
+        cursor.execute('''
+            SELECT id, is_completed, best_score, total_attempts 
+            FROM game_progress 
+            WHERE user_id = ? AND game_name = ?
+        ''', (user_id, 'vigenere'))
+        
+        existing = cursor.fetchone()
+        
+        if existing:
+            record_id, was_completed, old_score, attempts = existing
+            new_score = max(old_score, score)
+            
+            # Update existing record
+            cursor.execute('''
+                UPDATE game_progress 
+                SET is_completed = ?, best_score = ?, total_attempts = ?
+                WHERE id = ?
+            ''', (completed or was_completed, new_score, attempts + 1, record_id))
+            
+            # Update user total score if improved
+            if new_score > old_score:
+                score_diff = new_score - old_score
+                cursor.execute('''
+                    UPDATE users 
+                    SET total_score = total_score + ?
+                    WHERE id = ?
+                ''', (score_diff, user_id))
+                
+            # Update games completed if newly completed
+            if completed and not was_completed:
+                cursor.execute('''
+                    UPDATE users 
+                    SET games_completed = games_completed + 1
+                    WHERE id = ?
+                ''', (user_id,))
+        else:
+            # First time playing
+            cursor.execute('''
+                INSERT INTO game_progress (user_id, game_name, is_completed, best_score, total_attempts)
+                VALUES (?, 'vigenere', ?, ?, 1)
+            ''', (user_id, completed, score))
+            
+            # Update user stats
+            cursor.execute('''
+                UPDATE users 
+                SET total_score = total_score + ?
+                WHERE id = ?
+            ''', (score, user_id))
+            
+            if completed:
+                cursor.execute('''
+                    UPDATE users 
+                    SET games_completed = games_completed + 1
+                    WHERE id = ?
+                ''', (user_id,))
+        
+        conn.commit()
+        print(f"[DEBUG] Vigenere save successful!")
+        
+    except Exception as e:
+        print(f"[ERROR] Error saving vigenere progress: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
+# Example usage in each game:
+# At the end of password checker:
+# update_game_completion(current_user.id, 'pswd', final_score)
+#
+# At the end of quiz:
+# update_game_completion(current_user.id, 'quiz', score, force_complete=(score >= 3))
+#
+# etc.

@@ -320,7 +320,7 @@ def menu():
                         <div class="stat-label">Total Score</div>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">{current_user.games_completed}/6</span>
+                        <span class="stat-value">{current_user.games_completed}/7</span>
                         <div class="stat-label">Games Completed</div>
                     </div>
                     <div class="stat-item">

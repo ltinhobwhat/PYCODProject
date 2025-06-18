@@ -26,7 +26,7 @@ def get_leaderboard_data(limit=50):
             'username': user[0],
             'total_score': user[1],
             'games_completed': user[2],
-            'progress_percentage': (user[2] / 6) * 100,  # 6 total games
+            'progress_percentage': (user[2] / 7) * 100,  # CHANGÉ: 6 → 7
             'created_at': user[3]
         })
     
@@ -75,7 +75,7 @@ def get_user_dashboard_data(user_id):
             'rank': rank
         },
         'games': game_progress,
-        'progress_percentage': (user_data[2] / 6) * 100
+        'progress_percentage': (user_data[2] / 7) * 100
     }
 
 @leaderboard_bp.route('/')
@@ -204,7 +204,7 @@ def leaderboard():
                     <div class="stat-label">Highest Score</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">6</div>
+                    <div class="stat-number">7</div>
                     <div class="stat-label">Security Challenges</div>
                 </div>
                 <div class="stat-card">
@@ -244,8 +244,10 @@ def dashboard():
         'vigenere': {'name': 'Vigenère Cipher', 'max_score': 10},
         'hashgame': {'name': 'Hash Detective', 'max_score': 15},
         'sqlinjector': {'name': 'SQL Injection', 'max_score': 3},
-        'sqldefender': {'name': 'SQL Defense', 'max_score': 1}
+        'sqldefender': {'name': 'SQL Defense', 'max_score': 1},
+        'social': {'name': 'Social Engineering', 'max_score': 1}  # AJOUTÉ
     }
+
     
     # Calculate progress safely OUTSIDE the f-string
     progress_percentage = dashboard_data['progress_percentage']
@@ -378,7 +380,7 @@ def dashboard():
                     <div class="progress-text">{progress_percentage:.0f}%</div>
                 </div>
                 <p><strong>Total Score:</strong> {dashboard_data['user']['total_score']} points</p>
-                <p><strong>Games Completed:</strong> {dashboard_data['user']['games_completed']}/6</p>
+                <p><strong>Games Completed:</strong> {dashboard_data['user']['games_completed']}/7</p>
                 <p><strong>Global Rank:</strong> #{dashboard_data['user']['rank']}</p>
             </div>
             
@@ -492,7 +494,7 @@ def statistics():
                     <div class="stat-label">Active Players</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">6</div>
+                    <div class="stat-number">7</div>
                     <div class="stat-label">Total Challenges</div>
                 </div>
             </div>
