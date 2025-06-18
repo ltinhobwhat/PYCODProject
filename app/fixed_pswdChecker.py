@@ -508,19 +508,22 @@ def check_user_completed(user_id):
     return False, 0
 
 def save_game_progress(user_id, score):
-    """Save or update game progress"""
+    """Save or update game progress - FIXED VERSION"""
     conn = sqlite3.connect('game.db')
     cursor = conn.cursor()
     
     try:
         # Check if record exists
         cursor.execute('''
-            SELECT id, best_score, total_attempts 
+            SELECT id, best_score, total_attempts, is_completed
             FROM game_progress 
             WHERE user_id = ? AND game_name = 'pswd'
         ''', (user_id,))
         
         existing = cursor.fetchone()
+        
+        # FIXED: Check if this is first time completion BEFORE updating
+        is_first_completion = not existing or not existing[3]  # existing[3] is is_completed
         
         if existing:
             # Update existing record
@@ -539,19 +542,16 @@ def save_game_progress(user_id, score):
                 VALUES (?, 'pswd', 1, ?, 1)
             ''', (user_id, score))
         
-        # Update user's total score and games completed
-        cursor.execute('''
-            UPDATE users 
-            SET total_score = total_score + ?, 
-                games_completed = games_completed + 1
-            WHERE id = ? AND id NOT IN (
-                SELECT user_id FROM game_progress 
-                WHERE user_id = ? AND game_name = 'pswd' AND is_completed = 1
-            )
-        ''', (score, user_id, user_id))
+        # FIXED: Update user's total score and games completed if this is first completion
+        if is_first_completion:
+            cursor.execute('''
+                UPDATE users 
+                SET total_score = total_score + ?, games_completed = games_completed + 1
+                WHERE id = ?
+            ''', (score, user_id))
         
         conn.commit()
-        print(f"Game progress saved for user {user_id}: score {score}")
+        print(f"Game progress saved for user {user_id}: score {score}, first completion: {is_first_completion}")
         
     except Exception as e:
         print(f"Error saving game progress: {e}")
