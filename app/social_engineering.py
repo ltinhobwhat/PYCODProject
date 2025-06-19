@@ -253,18 +253,6 @@ MAIN_TEMPLATE = """
             <p style="text-align: center; margin: 20px 0;">
                 Test your awareness against social engineering tactics and see if you remember your passwords!
             </p>
-            <p style="text-align: center; color: #00ff88; font-weight: bold;">
-                Warning: This challenge will test your memory of the passwords you created earlier.
-            </p>
-        </div>
-        
-        <div class="scoring-info">
-            <h4>📊 Scoring System:</h4>
-            <ul style="margin: 5px 0; padding-left: 20px;">
-                <li><strong style="color: #00ff88;">Correct password:</strong> +10 points</li>
-                <li><strong style="color: #ff4545;">Forgotten password:</strong> -20 points</li>
-                <li>Remember all 3 passwords for the best score!</li>
-            </ul>
         </div>
         
         <form method="POST">
@@ -549,6 +537,14 @@ PASSWORD_TEST_TEMPLATE = """
         
         <div class="hint">
             💡 Hint: Strong passwords are memorable but hard to guess. Did you use a pattern?
+        </div>
+        <div class="scoring-info">
+            <h4>📊 Scoring System:</h4>
+            <ul style="margin: 5px 0; padding-left: 20px;">
+                <li><strong style="color: #00ff88;">Correct password:</strong> +10 points</li>
+                <li><strong style="color: #ff4545;">Forgotten password:</strong> -20 points</li>
+                <li>Remember all 3 passwords for the best score!</li>
+            </ul>
         </div>
     </div>
 </body>
